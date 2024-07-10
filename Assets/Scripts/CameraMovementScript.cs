@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent(typeof(PlayerMovementScript))]
+//[RequireComponent(typeof(PlayerMovementScript))]
 public class CameraMovementScript : MonoBehaviour {
 
     public float minZ = 0.0f;
     public float speedIncrementZ = 1.0f;
     public float speedOffsetZ = 4.0f;
     public bool moving = false;
+    public float cameraOffset = 3;
 
     private float CamPositionZ = 0;
     public GameObject player;
@@ -31,8 +32,8 @@ public class CameraMovementScript : MonoBehaviour {
         //Lazy camera behaviour that doesn't represent what happens in the game at all, but works for the moment
         minZ = Mathf.Max(minZ, player.transform.position.z - 9); //We can only go back three rows so lets clamp the camera accordingly
         //lets just move our camera position in alignment with our player for the moment, knowing that the player will be forced forward by the Eagle
-        CamPositionZ = Mathf.Lerp(CamPositionZ, Mathf.Max(minZ, player.transform.position.z-3), Time.deltaTime*2f); //So that we'll lerp after the player
-        transform.position = new Vector3(transform.position.x, transform.position.y, CamPositionZ);
+        CamPositionZ = Mathf.Lerp(CamPositionZ, Mathf.Max(minZ, player.transform.position.z), Time.deltaTime*2f); //So that we'll lerp after the player
+        transform.position = new Vector3(transform.position.x, transform.position.y, CamPositionZ + cameraOffset);
 
         /*
         if (moving) {
@@ -56,6 +57,8 @@ public class CameraMovementScript : MonoBehaviour {
         // TODO This kind of reset is dirty, refactor might be needed.
         moving = false;
         offset = initialOffset;
-        transform.position = new Vector3(2.5f, 10.0f, -7.5f);
+        transform.position = new Vector3(0f, 1f, 0f);
+        minZ = 0;
+        CamPositionZ = transform.position.z;
     }
 }

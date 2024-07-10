@@ -50,8 +50,12 @@ public class CarScript : MonoBehaviour {
     public void SetSpeed(float newSpeed)
     {
         speedX = newSpeed;
+        /*
         if (RightShadow) { RightShadow.SetActive(speedX > 0); }
         if (LeftShadow) { LeftShadow.SetActive(speedX < 0); }
+        */
+        RightShadow.SetActive(false);
+        LeftShadow.SetActive(false);
     }
 
     public void SetMaterialColor(Color newColor)
@@ -67,7 +71,7 @@ public class CarScript : MonoBehaviour {
         }
     }
 
-    public void Update() {
+    public void LateUpdate() {
         transform.position += new Vector3(speedX * Time.deltaTime, 0.0f, 0.0f);
     }
 

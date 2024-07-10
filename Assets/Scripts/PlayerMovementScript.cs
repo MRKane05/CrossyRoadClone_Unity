@@ -7,7 +7,7 @@ public class PlayerMovementScript : MonoBehaviour {
 
     public bool canMove = false;
     public LayerMask sopperLayerMask;
-    float stepTime = 0.5f;
+    float stepTime = 0.3f;
 
     public Animation HopAnimator;
     public GameObject CharacterBase;
@@ -76,7 +76,7 @@ public class PlayerMovementScript : MonoBehaviour {
 
     private void TickEagle()
     {
-        if (gameStateController.state == "play")
+        if (gameStateController.state == GameStateControllerScript.enGameState.PLAY) //"play")
         {
             EagleTimeTicker += Time.deltaTime;
         }
@@ -189,10 +189,9 @@ public class PlayerMovementScript : MonoBehaviour {
 
         //So we want to move our player to a new location. Of course this is going to be forced modal.
         Vector3 targetPosition = makeModal(newPosition);
+        HopAnimator.Stop(); //To give us a clean reset
         HopAnimator.Play();
         gameObject.transform.DOMove(targetPosition, stepTime).SetEase(Ease.Linear).OnComplete(() => ValidateMoveAndMap());
-
-
     }
 
     void ValidateMoveAndMap()
@@ -246,9 +245,14 @@ public class PlayerMovementScript : MonoBehaviour {
 
     public void Reset() {
         // TODO This kind of reset is dirty, refactor might be needed.
+        body.isKinematic = true;
         transform.position = new Vector3(0, 1, 0);
         transform.localScale = new Vector3(1, 1, 1);
         transform.rotation = Quaternion.identity;
+
+        //This is actually a good place to reset our camera
+        Camera.main.transform.position = gameObject.transform.position;
+
         score = 0;
     }
 }

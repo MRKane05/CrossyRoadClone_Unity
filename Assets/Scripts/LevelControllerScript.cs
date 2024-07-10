@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 public class LevelControllerScript : MonoBehaviour {
 
+    public enum enGameState { NULL, STARTSCREEN, PAUSED, PLAYING, GAMEOVER}
+    public enGameState GameState = enGameState.STARTSCREEN;
+
     public static LevelControllerScript Instance { get; private set; }
 
     public int minZ = 3;
@@ -16,18 +19,20 @@ public class LevelControllerScript : MonoBehaviour {
     public Dictionary<int, GameObject> lines;
 
     public GameObject player;
+    public GameObject camera;
+
     private Vector3 playerPosition = Vector3.zero;
     private float playerHighest = 0;
     private int playerHighestRow = 0;
 
-    public List<LineHandler.enLineType> SpawnedLines = new List<LineHandler.enLineType>();
+    public List<LineHandler> SpawnedLines = new List<LineHandler>();
 
     void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            //DontDestroyOnLoad(gameObject); // This will make sure the instance is not destroyed between scenes
+            DontDestroyOnLoad(gameObject); // This will make sure the instance is not destroyed between scenes
         }
         else
         {
@@ -45,10 +50,33 @@ public class LevelControllerScript : MonoBehaviour {
         SpawnInitialMap();
 	}
 
-    public void Reset()
+    public void GameReset()
     {
+        //Debug.LogError("Doing Reset");
+        foreach(LineHandler thisLine in SpawnedLines)
+        {
+            if (thisLine)
+            {
+                if (thisLine.gameObject)
+                {
+                    Destroy(thisLine.gameObject);
+                }
+            }
+        }
         SpawnedLines.Clear();
-        SpawnedLines = new List<LineHandler.enLineType>();
+        SpawnedLines = new List<LineHandler>();
+
+        //we need to put our character back in it's spot
+        player.transform.position = Vector3.up * 1f;     //Set to zero and up 1 unit
+        player.transform.localScale = Vector3.one;      //Reset scale just in case we've had something different change
+
+        playerPosition = player.transform.position;
+        playerHighest = player.transform.position.z;
+
+        player.GetComponent<PlayerMovementScript>().Reset();
+        camera.GetComponent<CameraMovementScript>().Reset();
+
+        SpawnInitialMap();
     }
 
     public void SpawnInitialMap()
@@ -74,10 +102,9 @@ public class LevelControllerScript : MonoBehaviour {
         Vector3 targetPosition = new Vector3(0, 0, newPosition);
         GameObject selectedPrefab = linePrefabs[Random.Range(0, linePrefabs.Length)];
         GameObject newline = Instantiate(selectedPrefab, targetPosition, Quaternion.identity) as GameObject;
-        Debug.Log("newLine: " + newline);
+        //Debug.Log("newLine: " + newline);
 
         newline.transform.position = targetPosition;
-        //newline.transform.SetParent(gameObject.transform);    //This system is prohibitive to parent setting!
         newline.transform.localScale = Vector3.one;
 
         //Lets do a bit of vetting and see if we need to put a joiner in place
@@ -86,7 +113,7 @@ public class LevelControllerScript : MonoBehaviour {
         if (SpawnedLines.Count > 1)
         {
             //Get our prior line
-            LineHandler.enLineType priorLineType = SpawnedLines[SpawnedLines.Count - 1];
+            LineHandler.enLineType priorLineType = SpawnedLines[SpawnedLines.Count - 1].LineType;
             
             switch (newHandler.LineType)
             {
@@ -102,7 +129,7 @@ public class LevelControllerScript : MonoBehaviour {
             newHandler.SetJoiningDetail(false); //So that our road edge isn't displayed if it's the frist on the map
         }
 
-        SpawnedLines.Add(newHandler.LineType);
+        SpawnedLines.Add(newHandler);
     }
 	
     public void Redundant_Update() {

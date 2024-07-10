@@ -18,7 +18,7 @@ public class TrunkGeneratorScript : MonoBehaviour {
 
     private float elapsedTime;
 
-    private List<GameObject> trunks;
+    private List<GameObject> trunks = new List<GameObject>();
 
     public void Start() {
 	    if (randomizeValues) {

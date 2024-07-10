@@ -19,7 +19,7 @@ public class RoadCarGenerator : MonoBehaviour {
 
     private float elapsedTime;
 
-    private List<GameObject> cars;
+    private List<GameObject> cars = new List<GameObject>();
 
     public Color[] CarColors;
 

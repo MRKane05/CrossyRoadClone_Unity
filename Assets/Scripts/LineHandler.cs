@@ -19,6 +19,7 @@ public class LineHandler : MonoBehaviour {
             {
                 if (LevelControllerScript.Instance.player.transform.position.z - gameObject.transform.position.z > clearDistance)
                 {
+                    Debug.Log("Destroying Line");
                     Destroy(gameObject);     //And all the cleanup should handle the rest!
                 }
             } else

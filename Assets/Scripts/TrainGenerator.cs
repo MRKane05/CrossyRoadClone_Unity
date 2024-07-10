@@ -20,7 +20,7 @@ public class TrainGenerator : MonoBehaviour
     private float nextTime;
     private bool bDoingTrain = false;
 
-    private List<GameObject> cars;
+    private List<GameObject> cars = new List<GameObject>();
 
     public GameObject railLine;
 

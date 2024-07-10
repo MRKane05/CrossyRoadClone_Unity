@@ -14,7 +14,7 @@ public class GenericGridObjectGeneratorScript : MonoBehaviour {
 
     public GameObject[] prefabs;
 
-    private List<GameObject> generatedObjects;
+    private List<GameObject> generatedObjects = new List<GameObject>() ;
 
     public void Start() {
         generatedObjects = new List<GameObject>();
