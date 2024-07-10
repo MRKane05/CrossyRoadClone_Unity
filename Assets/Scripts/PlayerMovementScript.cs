@@ -250,9 +250,6 @@ public class PlayerMovementScript : MonoBehaviour {
         transform.localScale = new Vector3(1, 1, 1);
         transform.rotation = Quaternion.identity;
 
-        //This is actually a good place to reset our camera
-        Camera.main.transform.position = gameObject.transform.position;
-
         score = 0;
     }
 }
