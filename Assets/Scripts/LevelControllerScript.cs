@@ -32,7 +32,7 @@ public class LevelControllerScript : MonoBehaviour {
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject); // This will make sure the instance is not destroyed between scenes
+            //DontDestroyOnLoad(gameObject); // This will make sure the instance is not destroyed between scenes
         }
         else
         {

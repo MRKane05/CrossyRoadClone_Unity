@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using static CanvasRotator;
 
 //[RequireComponent(typeof(PlayerMovementScript))]
 public class CameraMovementScript : MonoBehaviour {
@@ -17,7 +18,10 @@ public class CameraMovementScript : MonoBehaviour {
     private Vector3 offset;
     private Vector3 initialOffset;
 
+    Camera attachedCamera;
+
     public void Start() {
+        attachedCamera = gameObject.GetComponentInChildren<Camera>();
         CamPositionZ = transform.position.z;
 
         //player = GameObject.FindGameObjectWithTag("Player");
@@ -27,7 +31,26 @@ public class CameraMovementScript : MonoBehaviour {
         initialOffset = new Vector3(2.5f, 10.0f, -7.5f);
         offset = initialOffset;
 	}
-	
+
+    public void SetScreenOrientation(enScreenOrientation newScreenOrientation)
+    {
+        RectTransform ourRect = gameObject.GetComponent<RectTransform>();
+        switch (newScreenOrientation)
+        {
+            case enScreenOrientation.LANDSCAPE:
+                attachedCamera.transform.localEulerAngles = Vector3.zero;
+                break;
+            case enScreenOrientation.LEFT:
+                attachedCamera.transform.localEulerAngles = Vector3.forward * 90f;
+                break;
+            case enScreenOrientation.RIGHT:
+                attachedCamera.transform.localEulerAngles = Vector3.forward * 270f;
+                break;
+            default:
+                break;
+        }
+    }
+
     public void LateUpdate() {
         //Lazy camera behaviour that doesn't represent what happens in the game at all, but works for the moment
         minZ = Mathf.Max(minZ, player.transform.position.z - 9); //We can only go back three rows so lets clamp the camera accordingly

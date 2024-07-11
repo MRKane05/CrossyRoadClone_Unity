@@ -2,13 +2,19 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.IO;
+using static CanvasRotator;
 
 public class GameStateControllerScript : MonoBehaviour {
 
-    //public static GameStateControllerScript Instance { get; private set; }
+    public static GameStateControllerScript Instance { get; private set; }
+    public CanvasRotator canvasRotator;
+
+    public enScreenOrientation ScreenOrientation = enScreenOrientation.LANDSCAPE;
+
     public GameObject mainMenuCanvas;
     public GameObject playCanvas;
     public GameObject gameOverCanvas;
+    public GameObject optionsMenu;
 
     public Text playScore;
     public Text gameOverScore;
@@ -20,27 +26,69 @@ public class GameStateControllerScript : MonoBehaviour {
     public int score, top;
 
     private GameObject currentCanvas;
-    public enum enGameState { NULL, MAINMENU, PLAY, GAMEOVER }
+    public enum enGameState { NULL, MAINMENU, PLAY, GAMEOVER, OPTIONS, CHARACTERSELECT }
     public enGameState state = enGameState.MAINMENU;
+    enGameState prepause_state = enGameState.MAINMENU;
 
     public string filename = "top.txt";
+
+    public void UISetScreenOrientation(string orientation)
+    {
+        switch (orientation)
+        {
+            case "landscape":
+                SetScreenOrientation(enScreenOrientation.LANDSCAPE);
+                break;
+            case "left":
+                SetScreenOrientation(enScreenOrientation.LEFT);
+                break;
+            case "right":
+                SetScreenOrientation(enScreenOrientation.RIGHT);
+                break;
+            default:
+                SetScreenOrientation(enScreenOrientation.LANDSCAPE);
+                break;
+        }
+    }
+
+    public void SetScreenOrientation(enScreenOrientation newScreenOrientation)
+    {
+        //of course we need to know our rotator for our UI...
+        canvasRotator.SetScreenOrientation(newScreenOrientation);
+        LevelControllerScript.Instance.camera.GetComponent<CameraMovementScript>().SetScreenOrientation(newScreenOrientation);
+        ScreenOrientation = newScreenOrientation;
+    }
 
     public void TriggerEagle(Vector3 onThisPosition)
     {
         float eagleRange = 30f;
-        EagleObject.GetComponent<EagleScript>().SetEagleMovement(onThisPosition + Vector3.forward * eagleRange, onThisPosition - Vector3.forward * eagleRange);
+        //EagleObject.GetComponent<EagleScript>().SetEagleMovement(onThisPosition + Vector3.forward * eagleRange, onThisPosition - Vector3.forward * eagleRange);
+    }
+
+    void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            //DontDestroyOnLoad(gameObject); // This will make sure the instance is not destroyed between scenes
+        }
+        else
+        {
+            Destroy(gameObject); // Ensures there is only one instance
+        }
     }
 
     public void Start() {
         currentCanvas = null;
         MainMenu();
+        SetScreenOrientation(ScreenOrientation);
     }
 
     public void Update() {
         if (state == enGameState.PLAY) {//"play") {
-            topScore.text = PlayerPrefs.GetInt("Top").ToString();
+            //topScore.text = PlayerPrefs.GetInt("Top").ToString();
             playScore.text = score.ToString();
-            playerName.text = PlayerPrefs.GetString("Name");
+            //playerName.text = PlayerPrefs.GetString("Name");
         }
         else if (state == enGameState.MAINMENU) {//"mainmenu") {
             //We want this bound to a button now
@@ -115,6 +163,20 @@ public class GameStateControllerScript : MonoBehaviour {
         }
         LevelControllerScript.Instance.camera.GetComponent<CameraMovementScript>().moving = false;
         //GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovementScript>().moving = false;
+    }
+
+    public void SelectOptions(bool doOpen)
+    {
+        Time.timeScale = doOpen ? 0.001f : 1f;  //Pause our game
+        if (doOpen)
+        {
+            prepause_state = state; //So we know what to come back to
+            state = enGameState.OPTIONS;
+        } else
+        {
+            state = prepause_state; //Return to whatever we were :)
+        }
+        optionsMenu.SetActive(doOpen);
     }
 
     private GameObject CurrentCanvas {

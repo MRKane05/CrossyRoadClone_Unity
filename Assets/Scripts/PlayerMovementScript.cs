@@ -6,7 +6,7 @@ public class PlayerMovementScript : MonoBehaviour {
     public GameStateControllerScript gameStateController;
 
     public bool canMove = false;
-    public LayerMask sopperLayerMask;
+    public LayerMask stopperLayerMask;
     float stepTime = 0.3f;
 
     public Animation HopAnimator;
@@ -49,7 +49,6 @@ public class PlayerMovementScript : MonoBehaviour {
         mesh = GameObject.Find("Player/Chicken");
 
         score = 0;
-        //gameStateController = GameObject.Find("GameStateController").GetComponent<GameStateControllerScript>();
     }
 
     public void Update() {
@@ -76,20 +75,20 @@ public class PlayerMovementScript : MonoBehaviour {
 
     private void TickEagle()
     {
-        if (gameStateController.state == GameStateControllerScript.enGameState.PLAY) //"play")
+        if (gameStateController.state == GameStateControllerScript.enGameState.PLAY)
         {
             EagleTimeTicker += Time.deltaTime;
         }
 
         if (EagleTimeTicker > EagleWaitTime)
         {
-            Debug.Log("Calling Eagle");
+            //Debug.Log("Calling Eagle");
             gameStateController.TriggerEagle(transform.position);
         }
 
         if (backDirectionCount <= -maxBackmoves)
         {
-            Debug.Log("Call Eagle");
+            //Debug.Log("Call Eagle");
             gameStateController.TriggerEagle(transform.position);
         }
     }
@@ -125,27 +124,46 @@ public class PlayerMovementScript : MonoBehaviour {
     private void HandleInput() {	
 		// Handle mouse click
 		if (Input.GetMouseButtonDown(0)) {
-			HandleMouseClick();
+			//HandleMouseClick();   //Disable our touch input for now
 			return;
 		}
 		
-        if (Input.GetKeyDown(KeyCode.W) || Input.GetButtonDown("Dup")) {
+        if (Input.GetKeyDown(KeyCode.W) || Input.GetButtonDown("Dup") || Input.GetButtonDown("Triangle")) {
             Move(new Vector3(0, 0, 3));
         }
-        else if (Input.GetKeyDown(KeyCode.S) || Input.GetButtonDown("Ddown")) {
+        else if (Input.GetKeyDown(KeyCode.S) || Input.GetButtonDown("Ddown") || Input.GetButtonDown("Cross")) {
             Move(new Vector3(0, 0, -3));
         }
-        else if (Input.GetKeyDown(KeyCode.A) || Input.GetButtonDown("Dleft")) {
+        else if (Input.GetKeyDown(KeyCode.A) || Input.GetButtonDown("Dleft") || Input.GetButtonDown("Square")) {
             if (Mathf.RoundToInt(current.x) > minX)
                 Move(new Vector3(-3, 0, 0));
         }
-        else if (Input.GetKeyDown(KeyCode.D) || Input.GetButtonDown("Dright")) {
+        else if (Input.GetKeyDown(KeyCode.D) || Input.GetButtonDown("Dright") || Input.GetButtonDown("Circle")) {
             if (Mathf.RoundToInt(current.x) < maxX)
                 Move(new Vector3(3, 0, 0));
         }
     }
 
     private void Move(Vector3 distance) {
+        if (GameStateControllerScript.Instance.state != GameStateControllerScript.enGameState.PLAY) { return; } //Don't let the player move if we're not in play mode
+        //Debug.Log("In Distance: " + distance);
+        //So if we're rotated we'll have to rotate our movement direction...
+        switch (GameStateControllerScript.Instance.ScreenOrientation)
+        {
+            case CanvasRotator.enScreenOrientation.LANDSCAPE:
+                break; //Do nothing with our input
+            case CanvasRotator.enScreenOrientation.LEFT:
+                distance = Quaternion.AngleAxis(270, Vector3.up) * distance;
+                break;
+            case CanvasRotator.enScreenOrientation.RIGHT:
+                distance = Quaternion.AngleAxis(90, Vector3.up) * distance;
+                break;
+            default:
+                break;
+        }
+
+        //Debug.Log("Rotated Distance: " + distance);
+
         playerMoves++;
         EagleTimeTicker = 0; //We moved! Call off the Eagle!
 
@@ -153,14 +171,31 @@ public class PlayerMovementScript : MonoBehaviour {
 
         //PROBLEM: Need to see if we're moving into something
         // Don't move if blocked by obstacle.
-        if (Physics.CheckSphere(newPosition + new Vector3(0.0f, 0.5f, 0.0f), 0.1f, sopperLayerMask)) 
+        
+        if (Physics.CheckSphere(newPosition + new Vector3(0.0f, 0.5f, 0.0f), 0.1f, stopperLayerMask))
+        {
+            Debug.Log("Got Collision With Move");
             return;
+        }
 
         target = newPosition;
 
         moving = true;
         body.isKinematic = true;
+        //Debug.Log(MoveDirection);
+        CharacterBase.transform.LookAt(CharacterBase.transform.position + distance, Vector3.up);
+        if (distance.z < 0) //We're moving backwards
+        {
+            backDirectionCount++;
+        }
+        else
+        {
+            backDirectionCount = Mathf.Max(0, backDirectionCount - 1);
+        }
+        Debug.Log("BackCount: " + backDirectionCount);
 
+        //Debug.Log("Before Move");
+        /*
         switch (MoveDirection) {
             case "north":
                 CharacterBase.transform.rotation = Quaternion.Euler(0, 0, 0);
@@ -186,9 +221,11 @@ public class PlayerMovementScript : MonoBehaviour {
             default:
                 break;
         }
+        */
 
         //So we want to move our player to a new location. Of course this is going to be forced modal.
         Vector3 targetPosition = makeModal(newPosition);
+       
         HopAnimator.Stop(); //To give us a clean reset
         HopAnimator.Play();
         gameObject.transform.DOMove(targetPosition, stepTime).SetEase(Ease.Linear).OnComplete(() => ValidateMoveAndMap());
@@ -207,7 +244,12 @@ public class PlayerMovementScript : MonoBehaviour {
 
     private Vector3 makeModal(Vector3 newPosition)
     {
-        return new Vector3(newPosition.x, newPosition.y, Mathf.FloorToInt(newPosition.z / 3f) * 3f);
+        if (GameStateControllerScript.Instance.ScreenOrientation == CanvasRotator.enScreenOrientation.LANDSCAPE)
+        {
+            return new Vector3(newPosition.x, newPosition.y, Mathf.RoundToInt(newPosition.z / 3f) * 3f);
+        }
+        //Handle our side angles
+        return new Vector3(Mathf.RoundToInt(newPosition.x / 3f) * 3f, newPosition.y, newPosition.z);
     }
 
     public bool IsMoving {
@@ -230,7 +272,7 @@ public class PlayerMovementScript : MonoBehaviour {
                     return "east";
             }
             else
-                return null;
+                return "not moving";
         }
     }
 
