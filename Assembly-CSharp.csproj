@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{2A2074B3-CE84-35BE-85E2-AB168B988306}</ProjectGuid>
+    <ProjectGuid>{7803D364-356F-C4BB-812A-585861367671}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -65,7 +65,9 @@
      <Compile Include="Assets\Scripts\AlwaysRenderObject.cs" />
      <Compile Include="Assets\Scripts\AudioManager.cs" />
      <Compile Include="Assets\Scripts\CameraMovementScript.cs" />
+     <Compile Include="Assets\Scripts\CanvasRotator.cs" />
      <Compile Include="Assets\Scripts\CarScript.cs" />
+     <Compile Include="Assets\Scripts\CharacterSelectScreen.cs" />
      <Compile Include="Assets\Scripts\EagleScript.cs" />
      <Compile Include="Assets\Scripts\GameStateControllerScript.cs" />
      <Compile Include="Assets\Scripts\GenericGridObjectGeneratorScript.cs" />
@@ -78,6 +80,7 @@
      <Compile Include="Assets\Scripts\TrainGenerator.cs" />
      <Compile Include="Assets\Scripts\TrunkFloatingScript.cs" />
      <Compile Include="Assets\Scripts\TrunkGeneratorScript.cs" />
+     <Compile Include="Assets\Scripts\UI_CharacterSelectButton.cs" />
      <Compile Include="Assets\Scripts\WaterSplashScript.cs" />
      <Compile Include="Assets\ShaderAndMtrl\PlanarShadow.cs" />
      <Compile Include="Assets\SonyExamples\Vita\Input\Scripts\ButtonInput.cs" />
@@ -109,16 +112,16 @@
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Sprite.shader" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface.shader" />
  <Reference Include="UnityEditor.StandardEvents">
- <HintPath>C:/Users/kano/Documents/Projects/VitaGames/CrossyRoad/YungShenglu-CrossyRoads/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+ <HintPath>C:/Users/kano/Documents/Projects/VitaGames/CrossyRoad/CrossyRoadClone_Unity/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro.Editor">
- <HintPath>C:/Users/kano/Documents/Projects/VitaGames/CrossyRoad/YungShenglu-CrossyRoads/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+ <HintPath>C:/Users/kano/Documents/Projects/VitaGames/CrossyRoad/CrossyRoadClone_Unity/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.PackageManagerUI.Editor">
- <HintPath>C:/Users/kano/Documents/Projects/VitaGames/CrossyRoad/YungShenglu-CrossyRoads/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+ <HintPath>C:/Users/kano/Documents/Projects/VitaGames/CrossyRoad/CrossyRoadClone_Unity/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro">
- <HintPath>C:/Users/kano/Documents/Projects/VitaGames/CrossyRoad/YungShenglu-CrossyRoads/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+ <HintPath>C:/Users/kano/Documents/Projects/VitaGames/CrossyRoad/CrossyRoadClone_Unity/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.AIModule">
  <HintPath>C:/Program Files/Unity2018/Editor/Data/PlaybackEngines/PSP2Player/Tools/UnityEngine.AIModule.dll</HintPath>
@@ -313,7 +316,7 @@
  <HintPath>C:/Program Files/Unity2018/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
  </Reference>
  <Reference Include="DOTween">
- <HintPath>C:/Users/kano/Documents/Projects/VitaGames/CrossyRoad/YungShenglu-CrossyRoads/Assets/DOTween/DOTween.dll</HintPath>
+ <HintPath>C:/Users/kano/Documents/Projects/VitaGames/CrossyRoad/CrossyRoadClone_Unity/Assets/DOTween/DOTween.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Analytics">
  <HintPath>C:/Users/kano/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>
