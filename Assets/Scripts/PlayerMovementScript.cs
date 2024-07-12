@@ -10,7 +10,8 @@ public class PlayerMovementScript : MonoBehaviour {
     float stepTime = 0.3f;
 
     public Animation HopAnimator;
-    public GameObject CharacterBase;
+    public GameObject CharacterBase;    //What our prefab character will be spawned on (logically)
+    public GameObject DefaultCharacter;
 
     public int minX = -4;
     public int maxX = 4;
@@ -31,8 +32,26 @@ public class PlayerMovementScript : MonoBehaviour {
     public float EagleWaitTime = 5f;
     public int maxBackmoves = 3;
 
+    AudioSource ourAudio;
+    public AudioClip SFX_Jump;
+    public AudioClip SFX_Hit;
+    public AudioClip SFX_Drown;
+
     //private GameStateControllerScript gameStateController;
     private int score;
+
+    public void SetCharacter(GameObject thisCharacter)
+    {
+        //Clear anything we might have
+        foreach (Transform child in CharacterBase.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        GameObject newCharacter = Instantiate(thisCharacter, CharacterBase.transform);
+        newCharacter.transform.localPosition = Vector3.zero;
+        newCharacter.transform.localEulerAngles = Vector3.zero;
+    }
 
     void Awake()
     {
@@ -40,6 +59,9 @@ public class PlayerMovementScript : MonoBehaviour {
     }
 
     public void Start() {
+        ourAudio = gameObject.GetComponent<AudioSource>();
+        SetCharacter(DefaultCharacter);
+
         current = transform.position;
         moving = false;
         startY = transform.position.y;
@@ -49,6 +71,11 @@ public class PlayerMovementScript : MonoBehaviour {
         mesh = GameObject.Find("Player/Chicken");
 
         score = 0;
+    }
+
+    public void PlaySound(AudioClip targetSound)
+    {
+        ourAudio.PlayOneShot(targetSound);
     }
 
     public void Update() {
@@ -86,7 +113,7 @@ public class PlayerMovementScript : MonoBehaviour {
             gameStateController.TriggerEagle(transform.position);
         }
 
-        if (backDirectionCount <= -maxBackmoves)
+        if (backDirectionCount >= maxBackmoves)
         {
             //Debug.Log("Call Eagle");
             gameStateController.TriggerEagle(transform.position);
@@ -194,41 +221,14 @@ public class PlayerMovementScript : MonoBehaviour {
         }
         Debug.Log("BackCount: " + backDirectionCount);
 
-        //Debug.Log("Before Move");
-        /*
-        switch (MoveDirection) {
-            case "north":
-                CharacterBase.transform.rotation = Quaternion.Euler(0, 0, 0);
-                if (backDirectionCount < 0)
-                {
-                    backDirectionCount++;
-                }
-                break;
-            case "south":
-                CharacterBase.transform.rotation = Quaternion.Euler(0, 180, 0);
-                if (backDirectionCount > 0)
-                {
-                    backDirectionCount = 0;
-                }
-                backDirectionCount--;
-                break;
-            case "east":
-                CharacterBase.transform.rotation = Quaternion.Euler(0, 270, 0);
-                break;
-            case "west":
-                CharacterBase.transform.rotation = Quaternion.Euler(0, 90, 0);
-                break;
-            default:
-                break;
-        }
-        */
-
         //So we want to move our player to a new location. Of course this is going to be forced modal.
         Vector3 targetPosition = makeModal(newPosition);
        
         HopAnimator.Stop(); //To give us a clean reset
         HopAnimator.Play();
         gameObject.transform.DOMove(targetPosition, stepTime).SetEase(Ease.Linear).OnComplete(() => ValidateMoveAndMap());
+
+        PlaySound(SFX_Jump);
     }
 
     void ValidateMoveAndMap()
@@ -276,13 +276,23 @@ public class PlayerMovementScript : MonoBehaviour {
         }
     }
 
-    public void GameOver() {
+    public void GameOver(bool bPlayDieSound, bool bPlayDrownSound) {
         // When game over, disable moving.
         canMove = false;
 
         // Call GameOver at game state controller (instead of sending messages).
         //gameStateController.GameOver();
         gameStateController.GameOver();
+
+        //We need to figure out how we died to play the correct sound. For instance: was this drowning?
+        if (bPlayDieSound)
+        {
+            PlaySound(SFX_Hit);
+        }
+        if (bPlayDrownSound)
+        {
+            PlaySound(SFX_Drown);
+        }
     }
 
     public void Reset() {

@@ -1,10 +1,30 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.UI;
 using System.IO;
+
 using static CanvasRotator;
 
+
+[System.Serializable]
+public class SelectableCharacter
+{
+    public string CharacterName = "";
+    public GameObject Character;
+    public int cost = 100;
+}
+
+[System.Serializable]
+public class CharacterGroup
+{
+    public string GroupName = "";
+    public List<SelectableCharacter> GroupCharacters = new List<SelectableCharacter>();
+}
+
 public class GameStateControllerScript : MonoBehaviour {
+
+    public List<CharacterGroup> CharacterGroups = new List<CharacterGroup>();
 
     public static GameStateControllerScript Instance { get; private set; }
     public CanvasRotator canvasRotator;
@@ -15,6 +35,7 @@ public class GameStateControllerScript : MonoBehaviour {
     public GameObject playCanvas;
     public GameObject gameOverCanvas;
     public GameObject optionsMenu;
+    public GameObject characterSelect;
 
     public Text playScore;
     public Text gameOverScore;
@@ -62,7 +83,7 @@ public class GameStateControllerScript : MonoBehaviour {
     public void TriggerEagle(Vector3 onThisPosition)
     {
         float eagleRange = 30f;
-        //EagleObject.GetComponent<EagleScript>().SetEagleMovement(onThisPosition + Vector3.forward * eagleRange, onThisPosition - Vector3.forward * eagleRange);
+        EagleObject.GetComponent<EagleScript>().SetEagleMovement(onThisPosition + Vector3.forward * eagleRange, onThisPosition - Vector3.forward * eagleRange);
     }
 
     void Awake()
@@ -179,6 +200,21 @@ public class GameStateControllerScript : MonoBehaviour {
         optionsMenu.SetActive(doOpen);
     }
 
+    public void SelectCharacter(bool doOpen)
+    {
+        Time.timeScale = doOpen ? 0.001f : 1f;  //Pause our game
+        if (doOpen)
+        {
+            prepause_state = state; //So we know what to come back to
+            state = enGameState.CHARACTERSELECT;
+        }
+        else
+        {
+            state = prepause_state; //Return to whatever we were :)
+        }
+        characterSelect.SetActive(doOpen);
+    }
+
     private GameObject CurrentCanvas {
         get {
             return currentCanvas;
@@ -190,5 +226,23 @@ public class GameStateControllerScript : MonoBehaviour {
             currentCanvas = value;
             currentCanvas.SetActive(true);
         }
+    }
+
+    public void SelectCharacter(string thisCharacterName)
+    {
+        //So here we need to get the target character, and send the message through to the player that we want it changed
+        foreach (CharacterGroup characterGroup in CharacterGroups)
+        {
+            foreach (SelectableCharacter thisCharacter in characterGroup.GroupCharacters)
+            {
+                if (thisCharacterName == thisCharacter.CharacterName)
+                {
+                    LevelControllerScript.Instance.player.GetComponent<PlayerMovementScript>().SetCharacter(thisCharacter.Character);
+                }
+            }
+        }
+
+        //And after this we need to close our window
+        SelectCharacter(false);
     }
 }

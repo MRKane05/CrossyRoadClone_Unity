@@ -17,6 +17,8 @@ public class EagleScript : MonoBehaviour {
         setEagleVisibility(true);
         gameObject.transform.position = StartPosition;
         gameObject.transform.DOMove(EndPosition, passTime).SetEase(Ease.Linear).OnComplete(() => setEagleVisibility(false));
+
+        gameObject.GetComponent<AudioSource>().Play();  //Play our screech
     }
 
     void setEagleVisibility(bool state)
@@ -38,7 +40,7 @@ public class EagleScript : MonoBehaviour {
             PlayerMovementScript PlayerMove = other.GetComponent<PlayerMovementScript>();
             if (PlayerMove)
             {
-                PlayerMove.GameOver();
+                PlayerMove.GameOver(false, false);
             }
             other.gameObject.SetActive(false); //turn our player off so that it looks like it's been snatched
         }
