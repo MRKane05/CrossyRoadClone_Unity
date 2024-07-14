@@ -6,12 +6,14 @@ using static CanvasRotator;
 public class CameraMovementScript : MonoBehaviour {
 
     public float minZ = 0.0f;
+    public Vector2 XRange = Vector2.zero;
     public float speedIncrementZ = 1.0f;
     public float speedOffsetZ = 4.0f;
     public bool moving = false;
     public float cameraOffset = 3;
 
     private float CamPositionZ = 0;
+    private float CamPositionX = 0;
     public GameObject player;
     private PlayerMovementScript playerMovement;
 
@@ -56,7 +58,8 @@ public class CameraMovementScript : MonoBehaviour {
         minZ = Mathf.Max(minZ, player.transform.position.z - 9); //We can only go back three rows so lets clamp the camera accordingly
         //lets just move our camera position in alignment with our player for the moment, knowing that the player will be forced forward by the Eagle
         CamPositionZ = Mathf.Lerp(CamPositionZ, Mathf.Max(minZ, player.transform.position.z), Time.deltaTime*2f); //So that we'll lerp after the player
-        transform.position = new Vector3(transform.position.x, transform.position.y, CamPositionZ + cameraOffset);
+        CamPositionX = Mathf.Lerp(CamPositionX, Mathf.Clamp(player.transform.position.x, XRange.x, XRange.y), Time.deltaTime * 2f);
+        transform.position = new Vector3(CamPositionX, transform.position.y, CamPositionZ + cameraOffset);
 
         /*
         if (moving) {

@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 using System.IO;
+using TMPro;
+using DG.Tweening;
 
 using static CanvasRotator;
 
@@ -12,7 +14,8 @@ public class SelectableCharacter
 {
     public string CharacterName = "";
     public GameObject Character;
-    public int cost = 100;
+    public int cost = 100;  //Don't know if we'll be buying directly or having a gambling mechanic
+    public bool Unlocked = false;
 }
 
 [System.Serializable]
@@ -44,7 +47,9 @@ public class GameStateControllerScript : MonoBehaviour {
 
     public GameObject EagleObject;
 
-    public int score, top;
+    public int score, score_top, coins;
+    public int _score;
+    public Text CoinsDisplay;
 
     private GameObject currentCanvas;
     public enum enGameState { NULL, MAINMENU, PLAY, GAMEOVER, OPTIONS, CHARACTERSELECT }
@@ -103,12 +108,31 @@ public class GameStateControllerScript : MonoBehaviour {
         currentCanvas = null;
         MainMenu();
         SetScreenOrientation(ScreenOrientation);
+
+        //Load our prefs details
+        coins = PlayerPrefs.GetInt("Coins");
+        score_top = PlayerPrefs.GetInt("TopScore"); //Retrieve our top score
+        topScore.text = score_top.ToString();
+        SetCoinsDisplay(coins);
+        playScore.text = "0";   //Set our scores
     }
 
     public void Update() {
         if (state == enGameState.PLAY) {//"play") {
             //topScore.text = PlayerPrefs.GetInt("Top").ToString();
-            playScore.text = score.ToString();
+            //we really shouldn't update this every tick!
+            if (_score != score)
+            {
+                _score = score;
+                playScore.text = score.ToString();
+                if (score > score_top)
+                {
+                    score_top = score;
+                    PlayerPrefs.SetInt("TopScore", score_top);
+                    topScore.text = score_top.ToString();
+                    topScore.transform.DOPunchScale(Vector3.one * 0.2f, 0.5f);  //This is big! We set our top score!
+                }
+            }
             //playerName.text = PlayerPrefs.GetString("Name");
         }
         else if (state == enGameState.MAINMENU) {//"mainmenu") {
@@ -174,13 +198,11 @@ public class GameStateControllerScript : MonoBehaviour {
         state = enGameState.GAMEOVER;// "gameover";
 
         gameOverScore.text = score.ToString();
-        if (score > top) {
-            PlayerPrefs.SetInt("Top", top);
-            /*
-            var sw = File.CreateText(filename);
-            sw.Write(top);
-            sw.Close();
-            */
+        if (score > score_top) {
+            score_top = score;
+            //PlayerPrefs.SetInt("TopScore", score_top);
+            topScore.text = score_top.ToString();
+            //topScore.transform.DOPunchScale(Vector3.one * 1.1f, 0.5f);  //This is big! We set our top score!
         }
         LevelControllerScript.Instance.camera.GetComponent<CameraMovementScript>().moving = false;
         //GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovementScript>().moving = false;
@@ -244,5 +266,19 @@ public class GameStateControllerScript : MonoBehaviour {
 
         //And after this we need to close our window
         SelectCharacter(false);
+    }
+
+    public void ChangeCoinTotal(int byThis)
+    {
+        
+        coins += byThis;
+        PlayerPrefs.SetInt("Coins", coins); //Update our new prefs
+        SetCoinsDisplay(coins);
+    }
+
+    public void SetCoinsDisplay(int toThis)
+    {
+        CoinsDisplay.text = toThis.ToString();
+        CoinsDisplay.transform.DOPunchScale(Vector3.one * 0.25f, 0.75f); //To show that we've got something :)
     }
 }

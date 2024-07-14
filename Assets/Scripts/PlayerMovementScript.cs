@@ -93,9 +93,9 @@ public class PlayerMovementScript : MonoBehaviour {
                 HandleInput();
         }
 
-        score = Mathf.Max(score, (int)current.z);
+        score = Mathf.Max(score, (int)current.z/3);
         //gameStateController.score = score / 3;
-        gameStateController.score = score / 3;
+        gameStateController.score = score;// / 3;
 
         TickEagle();
     }
@@ -219,7 +219,7 @@ public class PlayerMovementScript : MonoBehaviour {
         {
             backDirectionCount = Mathf.Max(0, backDirectionCount - 1);
         }
-        Debug.Log("BackCount: " + backDirectionCount);
+        //Debug.Log("BackCount: " + backDirectionCount);
 
         //So we want to move our player to a new location. Of course this is going to be forced modal.
         Vector3 targetPosition = makeModal(newPosition);

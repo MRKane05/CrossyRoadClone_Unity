@@ -23,7 +23,7 @@ public class CharacterSelectScreen : MonoBehaviour {
 			foreach(SelectableCharacter thisCharacter in characterGroup.GroupCharacters)
             {
 				GameObject newButton = Instantiate(SelectButtonPrefab, GridDisplayArea.transform);
-				newButton.GetComponent<UI_CharacterSelectButton>().setButtonDetails(thisCharacter.CharacterName);
+				newButton.GetComponent<UI_CharacterSelectButton>().setButtonDetails(thisCharacter.CharacterName, thisCharacter.Unlocked);
 			}
         }
     }
