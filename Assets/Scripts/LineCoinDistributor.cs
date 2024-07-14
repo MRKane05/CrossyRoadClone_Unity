@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LineCoinDistributor : MonoBehaviour {
 	public GameObject coinPrefab;
-	float coinOdds = 0.2f;	//For the moment :)
+	float coinOdds = 0.15f;	//For the moment :)
 	// Use this for initialization
 	void Start () {
 		if (Random.value < coinOdds)

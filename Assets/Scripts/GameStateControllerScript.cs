@@ -39,6 +39,9 @@ public class GameStateControllerScript : MonoBehaviour {
     public GameObject gameOverCanvas;
     public GameObject optionsMenu;
     public GameObject characterSelect;
+    public GameObject prizeMenu;
+
+    public BonusNotification playNotification;
 
     public Text playScore;
     public Text gameOverScore;
@@ -52,11 +55,15 @@ public class GameStateControllerScript : MonoBehaviour {
     public Text CoinsDisplay;
 
     private GameObject currentCanvas;
-    public enum enGameState { NULL, MAINMENU, PLAY, GAMEOVER, OPTIONS, CHARACTERSELECT }
+    public enum enGameState { NULL, MAINMENU, PLAY, GAMEOVER, OPTIONS, CHARACTERSELECT, PRIZEMENU }
     public enGameState state = enGameState.MAINMENU;
     enGameState prepause_state = enGameState.MAINMENU;
 
     public string filename = "top.txt";
+
+    //Details for keeping a ticker on our score beating
+    bool bPassedHalfway = false;
+    bool bBeatTopScore = false;
 
     public void UISetScreenOrientation(string orientation)
     {
@@ -96,7 +103,6 @@ public class GameStateControllerScript : MonoBehaviour {
         if (Instance == null)
         {
             Instance = this;
-            //DontDestroyOnLoad(gameObject); // This will make sure the instance is not destroyed between scenes
         }
         else
         {
@@ -115,6 +121,9 @@ public class GameStateControllerScript : MonoBehaviour {
         topScore.text = score_top.ToString();
         SetCoinsDisplay(coins);
         playScore.text = "0";   //Set our scores
+
+        bPassedHalfway = false;
+        bBeatTopScore = false;
     }
 
     public void Update() {
@@ -127,23 +136,30 @@ public class GameStateControllerScript : MonoBehaviour {
                 playScore.text = score.ToString();
                 if (score > score_top)
                 {
+                    if (!bBeatTopScore)
+                    {
+                        bBeatTopScore = true;
+                        playNotification.DisplayRect("Top score\nget 50c");
+                        ChangeCoinTotal(50);
+                    }
                     score_top = score;
                     PlayerPrefs.SetInt("TopScore", score_top);
                     topScore.text = score_top.ToString();
                     topScore.transform.DOPunchScale(Vector3.one * 0.2f, 0.5f);  //This is big! We set our top score!
                 }
+                if (score > score_top / 2f)
+                {
+                    if (!bPassedHalfway)
+                    {
+                        bPassedHalfway = true;
+                        playNotification.DisplayRect("halfway\nget 25c");
+                        ChangeCoinTotal(25);
+                    }
+                }
             }
-            //playerName.text = PlayerPrefs.GetString("Name");
         }
         else if (state == enGameState.MAINMENU) {//"mainmenu") {
-            //We want this bound to a button now
-            /*
-            if (Input.GetButtonDown("Cancel")) {
-                Application.Quit();
-            }
-            else if (Input.anyKeyDown) {
-                Play();
-            }*/
+
         }
         else if (state == enGameState.GAMEOVER) {//"gameover") {
             if (Input.anyKeyDown) {
@@ -158,28 +174,13 @@ public class GameStateControllerScript : MonoBehaviour {
     {
         LevelControllerScript.Instance.GameReset(); //PROBLEM: The reset system needs a lot of refinement
         MainMenu();
+        bPassedHalfway = false;
+        bBeatTopScore = false;
     }
 
     public void MainMenu() {
         CurrentCanvas = mainMenuCanvas;
         state = enGameState.MAINMENU;// "mainmenu";
-
-        //PROBLEM: This is terrible coding!
-        /*
-        GameObject.Find("LevelController").SendMessage("Reset");
-        GameObject.FindGameObjectWithTag("Player").SendMessage("Reset");
-        GameObject.FindGameObjectWithTag("MainCamera").SendMessage("Reset");
-        */
-
-        /*
-        File.SetAttributes(Application.dataPath + "/" + filename, FileAttributes.Normal);
-        StreamReader sr = new StreamReader(Application.dataPath + "/" + filename);
-        string fileContent = sr.ReadLine();
-
-        sr.Close();
-        
-        topScore.text = fileContent;
-        */
     }
 
     public void Play() {
@@ -235,6 +236,38 @@ public class GameStateControllerScript : MonoBehaviour {
             state = prepause_state; //Return to whatever we were :)
         }
         characterSelect.SetActive(doOpen);
+    }
+
+    public void SetCharacterLockState(string characterName, bool state)
+    {
+        foreach (CharacterGroup characterGroup in CharacterGroups)
+        {
+            foreach (SelectableCharacter thisCharacter in characterGroup.GroupCharacters)
+            {
+                if (thisCharacter.CharacterName == characterName)
+                {
+                    thisCharacter.Unlocked = state;
+                }
+            }
+        }
+    }
+
+    public void SelectPrizeMenu(bool doOpen)
+    {
+        Time.timeScale = doOpen ? 0.001f : 1f;  //Pause our game
+        prizeMenu.SetActive(doOpen);
+        
+        if (doOpen)
+        {
+            prepause_state = state; //So we know what to come back to
+            state = enGameState.PRIZEMENU;
+            prizeMenu.GetComponent<PrizeMenuHandler>().OpenMenu();
+        }
+        else
+        {
+            state = prepause_state; //Return to whatever we were :)
+        }
+
     }
 
     private GameObject CurrentCanvas {
