@@ -7,7 +7,9 @@ using DG.Tweening;
 
 public class PrizeMenuHandler : MonoBehaviour {
     public List<SelectableCharacter> CharacterList = new List<SelectableCharacter>();
+    [Header("Character Display Values")]
     public GameObject displayArea;
+    public GameObject displayAnchor; //What our prefab will be displayed on
     public GameObject displayIcon;
     public GameObject prizeMachineGraphic;
     public TextMeshProUGUI WinningTitle;
@@ -27,6 +29,8 @@ public class PrizeMenuHandler : MonoBehaviour {
     public void Start()
     {
         ourAudio = gameObject.GetComponent<AudioSource>();
+        //Vector3 q = gameObject.transform.rotation * new Vector3(0, 360, 0);
+        //displayAnchor.transform.DORotate(q, 5).SetLoops(-1).SetEase(Ease.Linear);
     }
 
     //As this needs a default state start
@@ -36,6 +40,12 @@ public class PrizeMenuHandler : MonoBehaviour {
         displayIcon.SetActive(false);
         displayArea.SetActive(false);
         alreadyOwnedLabel.SetActive(false);
+        displayAnchor.SetActive(false);
+        //Clear our gameobject children
+        foreach (Transform child in displayAnchor.transform)
+        {
+            Destroy(child.gameObject);
+        }
         Time.timeScale = 1f;    //Set our time scale just in case it got screwy with the menu
 
         //We need to look at what our current setup is and disable buttons as necessary/show notices
@@ -49,11 +59,16 @@ public class PrizeMenuHandler : MonoBehaviour {
         }
     }
 
+    void Update()
+    {
+        displayAnchor.transform.localEulerAngles += Vector3.up * Time.deltaTime * 30f;
+    }
+
     public void PlayPrizeMachine()
     { 
         if (!bPrizeRunning)
         {
-            GameStateControllerScript.Instance.ChangeCoinTotal(100);
+            GameStateControllerScript.Instance.ChangeCoinTotal(-100);
             OpenMenu(); //reset everything to our default state
             StartCoroutine(DoPrizeMachine());
         }
@@ -98,6 +113,14 @@ public class PrizeMenuHandler : MonoBehaviour {
         WinningTitle.text = newPrize.CharacterName;
         displayIcon.SetActive(true);
         displayIcon.GetComponent<Image>().sprite = CharacterIcon;
+
+        //Put our character on the display point
+        displayAnchor.SetActive(true);
+        GameObject characterPrefab = Instantiate(newPrize.Character, displayAnchor.transform);
+        characterPrefab.transform.localPosition = Vector3.zero;
+        characterPrefab.transform.localScale = Vector3.one;
+        displayAnchor.transform.localEulerAngles = new Vector3(0, 125, 0);  //Set our angle
+        displayAnchor.transform.DOShakeScale(0.5f);
 
         if (!newPrize.Unlocked)
         {

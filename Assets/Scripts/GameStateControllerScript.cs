@@ -64,6 +64,9 @@ public class GameStateControllerScript : MonoBehaviour {
     //Details for keeping a ticker on our score beating
     bool bPassedHalfway = false;
     bool bBeatTopScore = false;
+    int passedIntiger = 1; //This will be multiplied by 25 to mark milestones
+
+
 
     public void UISetScreenOrientation(string orientation)
     {
@@ -124,11 +127,17 @@ public class GameStateControllerScript : MonoBehaviour {
 
         bPassedHalfway = false;
         bBeatTopScore = false;
-
+        passedIntiger = 1;
         optionsMenu.SetActive(true); //Turn this on so that our prefs can take effect
     }
 
     public void Update() {
+        //Add some coins for testing
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            //ChangeCoinTotal(100);
+        }
+
         if (state == enGameState.PLAY) {//"play") {
             //topScore.text = PlayerPrefs.GetInt("Top").ToString();
             //we really shouldn't update this every tick!
@@ -141,8 +150,8 @@ public class GameStateControllerScript : MonoBehaviour {
                     if (!bBeatTopScore)
                     {
                         bBeatTopScore = true;
-                        playNotification.DisplayRect("Top score\nget 50c");
-                        ChangeCoinTotal(50);
+                        playNotification.DisplayRect("Top score\nget 25c");
+                        ChangeCoinTotal(25);
                     }
                     score_top = score;
                     PlayerPrefs.SetInt("TopScore", score_top);
@@ -154,10 +163,18 @@ public class GameStateControllerScript : MonoBehaviour {
                     if (!bPassedHalfway)
                     {
                         bPassedHalfway = true;
-                        playNotification.DisplayRect("halfway\nget 25c");
-                        ChangeCoinTotal(25);
+                        playNotification.DisplayRect("halfway\nget 15c");
+                        ChangeCoinTotal(15);
                     }
                 }
+                if (score > passedIntiger * 25)
+                {
+                    int coinReward = 5 * passedIntiger;
+                    playNotification.DisplayRect("passed " + passedIntiger * 25 + "\n get " + coinReward);
+                    ChangeCoinTotal(coinReward);
+                }
+
+                //We could do with some other benchmark things, like "passed 25 lines"
             }
         }
         else if (state == enGameState.MAINMENU) {//"mainmenu") {
@@ -178,6 +195,7 @@ public class GameStateControllerScript : MonoBehaviour {
         MainMenu();
         bPassedHalfway = false;
         bBeatTopScore = false;
+        passedIntiger = 1;
     }
 
     public void MainMenu() {
@@ -305,7 +323,7 @@ public class GameStateControllerScript : MonoBehaviour {
 
     public void ChangeCoinTotal(int byThis)
     {
-        
+        Debug.Log("Changing Coin Total: " + byThis);   
         coins += byThis;
         PlayerPrefs.SetInt("Coins", coins); //Update our new prefs
         SetCoinsDisplay(coins);
