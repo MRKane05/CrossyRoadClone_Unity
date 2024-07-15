@@ -156,7 +156,7 @@ public class GameStateControllerScript : MonoBehaviour {
                     score_top = score;
                     PlayerPrefs.SetInt("TopScore", score_top);
                     topScore.text = score_top.ToString();
-                    topScore.transform.DOPunchScale(Vector3.one * 0.2f, 0.5f);  //This is big! We set our top score!
+                    topScore.transform.DOPunchScale(Vector3.one * 0.2f, 0.5f).OnComplete(() => { topScore.transform.localScale = Vector3.one; }); ;  //This is big! We set our top score!
                 }
                 if (score > score_top / 2f && score_top > 0)
                 {
@@ -332,6 +332,6 @@ public class GameStateControllerScript : MonoBehaviour {
     public void SetCoinsDisplay(int toThis)
     {
         CoinsDisplay.text = toThis.ToString();
-        CoinsDisplay.transform.DOPunchScale(Vector3.one * 0.25f, 0.75f); //To show that we've got something :)
+        CoinsDisplay.transform.DOPunchScale(Vector3.one * 0.25f, 0.75f).OnComplete(() => { CoinsDisplay.transform.localScale = Vector3.one; }); //To show that we've got something :)
     }
 }

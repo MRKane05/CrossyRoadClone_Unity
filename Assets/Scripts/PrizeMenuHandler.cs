@@ -17,13 +17,16 @@ public class PrizeMenuHandler : MonoBehaviour {
     public Sprite CharacterIcon, MoneyIcon, PowerupIcon;
     [Space]
     [Header("Finesse Elements")]
-    public Button DoSpinButton, PlayButton;
+    public Button DoSpinButton, PlayButton, CloseButton;
     public GameObject InsufficentCoinsNotice;
     public TextMeshProUGUI InsufficentCoinsText;
     public AudioClip sound_SelectPrize, sound_Character, sound_Powerup, sound_Cash;
 
     AudioSource ourAudio;
     string UnlockedCharcter = "";
+
+    float CharacterOdds = 0.4f; //If we're below this we'll get a character
+    float PowerupOdds = 0.6f; //If we're above this we'll get a powerup. If we're neither we'll get money
 
     bool bPrizeRunning = false;
     public void Start()
@@ -76,6 +79,10 @@ public class PrizeMenuHandler : MonoBehaviour {
 
     IEnumerator DoPrizeMachine() { 
         bPrizeRunning = true;
+
+        DoSpinButton.interactable = false;
+        PlayButton.interactable = false;
+        CloseButton.interactable = false;
         //So basically this needs to look at our characters, powerups (which will also be purchasable), and a monetry reward :)
 
         //For the moment lets just randomly go through our characters
@@ -89,12 +96,12 @@ public class PrizeMenuHandler : MonoBehaviour {
         }
 
         //Select a character as a prize
-        SelectableCharacter newPrize = CharacterList[Mathf.FloorToInt(Random.RandomRange(0, CharacterList.Count))];
+        
         //newPrize = new SelectableCharacter();
         //newPrize.CharacterName = "Chicken";
         //newPrize.Unlocked = true;
 
-        Debug.Log(newPrize.CharacterName);
+        //Debug.Log(newPrize.CharacterName);
         ourAudio.clip = sound_SelectPrize;
         ourAudio.Play();
 
@@ -105,49 +112,79 @@ public class PrizeMenuHandler : MonoBehaviour {
 
         //We need some way of selecting what prize we'll be giving out.
 
-        ourAudio.clip = sound_Character;
-        ourAudio.Play();
-
         displayArea.SetActive(true);
-        displayArea.transform.DOPunchScale(Vector3.one * 0.2f, 0.5f);
-        WinningTitle.text = newPrize.CharacterName;
+        displayArea.transform.DOPunchScale(Vector3.one * 0.2f, 0.5f).OnComplete(() => { displayArea.transform.localScale = Vector3.one; }); ;
         displayIcon.SetActive(true);
-        displayIcon.GetComponent<Image>().sprite = CharacterIcon;
+        
+        //We need to see about setting things up for character/money/powerup
+        float prizeDraw = Random.value;
 
-        //Put our character on the display point
-        displayAnchor.SetActive(true);
-        GameObject characterPrefab = Instantiate(newPrize.Character, displayAnchor.transform);
-        characterPrefab.transform.localPosition = Vector3.zero;
-        characterPrefab.transform.localScale = Vector3.one;
-        displayAnchor.transform.localEulerAngles = new Vector3(0, 125, 0);  //Set our angle
-        displayAnchor.transform.DOShakeScale(0.5f);
-
-        if (!newPrize.Unlocked)
+        //First up our character :)
+        if (prizeDraw < CharacterOdds && false)
         {
-            //Ok, awesome, we've got something here. Now to see if it's already unlocked, and if not we should give a monetry return :)
-            bool bAlreadyUnlocked = false;
-            foreach (CharacterGroup characterGroup in GameStateControllerScript.Instance.CharacterGroups)
+            ourAudio.clip = sound_Character;
+            ourAudio.Play();
+            SelectableCharacter newPrize = CharacterList[Mathf.FloorToInt(Random.RandomRange(0, CharacterList.Count))];
+            WinningTitle.text = newPrize.CharacterName;
+
+            displayIcon.GetComponent<Image>().sprite = CharacterIcon;
+            //Put our character on the display point
+            displayAnchor.SetActive(true);
+            GameObject characterPrefab = Instantiate(newPrize.Character, displayAnchor.transform);
+            characterPrefab.transform.localPosition = Vector3.zero;
+            characterPrefab.transform.localScale = Vector3.one;
+            displayAnchor.transform.localEulerAngles = new Vector3(0, 125, 0);  //Set our angle
+            displayAnchor.transform.DOShakeScale(0.5f);
+
+            if (!newPrize.Unlocked)
             {
-                foreach (SelectableCharacter thisCharacter in characterGroup.GroupCharacters)
+                //Ok, awesome, we've got something here. Now to see if it's already unlocked, and if not we should give a monetry return :)
+                bool bAlreadyUnlocked = false;
+                foreach (CharacterGroup characterGroup in GameStateControllerScript.Instance.CharacterGroups)
                 {
-                    if (thisCharacter.CharacterName == newPrize.CharacterName)
+                    foreach (SelectableCharacter thisCharacter in characterGroup.GroupCharacters)
                     {
-                        //thisCharacter.Unlocked = true;  //Unlock this character for our player
-                        GameStateControllerScript.Instance.SetCharacterLockState(thisCharacter.CharacterName, true);
-                        UnlockedCharcter = thisCharacter.CharacterName;
+                        if (thisCharacter.CharacterName == newPrize.CharacterName)
+                        {
+                            //thisCharacter.Unlocked = true;  //Unlock this character for our player
+                            GameStateControllerScript.Instance.SetCharacterLockState(thisCharacter.CharacterName, true);
+                            UnlockedCharcter = thisCharacter.CharacterName;
+                        }
                     }
                 }
             }
-        } else
+            else
+            {
+                yield return new WaitForSeconds(1.5f);
+                ourAudio.clip = sound_Cash;
+                ourAudio.Play();
+                alreadyOwnedLabel.SetActive(true);
+                alreadyOwnedLabel.transform.DOPunchScale(Vector3.one * 1.5f, 0.75f).OnComplete(() => { alreadyOwnedLabel.transform.localScale = Vector3.one; }); ;
+                GameStateControllerScript.Instance.ChangeCoinTotal(75); //Give our player 75 coins
+            }
+        } else if (prizeDraw > PowerupOdds && false) //get a powerup
         {
-            yield return new WaitForSeconds(1.5f);
+            displayIcon.GetComponent<Image>().sprite = PowerupIcon;
+            Debug.Log("Got a powerup");
+
+        } else //You get cash!
+        {
+            int cashAmount = 75 + 25 * Mathf.FloorToInt(Random.RandomRange(0, 5));
+            WinningTitle.text = "Coins: " + cashAmount;
+            GameStateControllerScript.Instance.ChangeCoinTotal(cashAmount);
+
+            displayIcon.GetComponent<Image>().sprite = MoneyIcon;
+            //yield return new WaitForSeconds(1.5f);
             ourAudio.clip = sound_Cash;
             ourAudio.Play();
-            alreadyOwnedLabel.SetActive(true);
-            alreadyOwnedLabel.transform.DOPunchScale(Vector3.one * 1.5f, 0.75f);
+            //alreadyOwnedLabel.SetActive(true);
+            //alreadyOwnedLabel.transform.DOPunchScale(Vector3.one * 1.5f, 0.75f);
             GameStateControllerScript.Instance.ChangeCoinTotal(75); //Give our player 75 coins
         }
-        //PlayButton.interactable = true; // UnlockedCharcter == "" ? false : true;    //Set our play button depending on what we got
+
+        DoSpinButton.interactable = GameStateControllerScript.Instance.coins > 100;
+        PlayButton.interactable = true;
+        CloseButton.interactable = true;
         //We'd be wise to save at this point also
         SaveScoreUtility.Instance.SaveGameInformation();
         bPrizeRunning = false; //Free up our system for re-use

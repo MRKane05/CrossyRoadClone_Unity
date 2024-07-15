@@ -31,7 +31,7 @@ public class UI_CharacterSelectButton : MonoBehaviour {
 			GameStateControllerScript.Instance.SelectCharacter(SelectionName);
 		} else
         {
-			LockIcon.transform.DOPunchScale(Vector3.one * 0.5f, 0.5f).SetUpdate(true);
+			LockIcon.transform.DOPunchScale(Vector3.one * 0.5f, 0.5f).SetUpdate(true).OnComplete(() => { LockIcon.transform.localScale = Vector3.one; }); ;
         }
 	}
 
