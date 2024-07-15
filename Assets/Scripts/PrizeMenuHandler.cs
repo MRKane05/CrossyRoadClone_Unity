@@ -120,7 +120,7 @@ public class PrizeMenuHandler : MonoBehaviour {
         float prizeDraw = Random.value;
 
         //First up our character :)
-        if (prizeDraw < CharacterOdds && false)
+        if (prizeDraw < CharacterOdds)
         {
             ourAudio.clip = sound_Character;
             ourAudio.Play();
@@ -162,14 +162,16 @@ public class PrizeMenuHandler : MonoBehaviour {
                 alreadyOwnedLabel.transform.DOPunchScale(Vector3.one * 1.5f, 0.75f).OnComplete(() => { alreadyOwnedLabel.transform.localScale = Vector3.one; }); ;
                 GameStateControllerScript.Instance.ChangeCoinTotal(75); //Give our player 75 coins
             }
-        } else if (prizeDraw > PowerupOdds && false) //get a powerup
+        } else if (prizeDraw > PowerupOdds) //get a powerup
         {
             displayIcon.GetComponent<Image>().sprite = PowerupIcon;
             Debug.Log("Got a powerup");
+            WinningTitle.text = "POWERUP";
+            GameStateControllerScript.Instance.ChangeCoinTotal(100); //Give cash back for testing purposes
 
         } else //You get cash!
         {
-            int cashAmount = 75 + 25 * Mathf.FloorToInt(Random.RandomRange(0, 5));
+            int cashAmount = 50 + 25 * Mathf.FloorToInt(Random.RandomRange(0, 6));
             WinningTitle.text = "Coins: " + cashAmount;
             GameStateControllerScript.Instance.ChangeCoinTotal(cashAmount);
 
