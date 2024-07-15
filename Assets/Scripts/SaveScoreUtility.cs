@@ -226,7 +226,7 @@ public class SaveScoreUtility : MonoBehaviour
 		string SaveGameState = JsonUtility.ToJson(GameSaveInformation);
 
 		StreamWriter writer = new StreamWriter(path + "/CrossySave.json");
-		print("Save Path: " + path + "/CrossySave.json");
+		Debug.Log("Save Path: " + path + "/CrossySave.json");
 		writer.AutoFlush = true;
 		writer.Write(SaveGameState);
 		writer.Close();

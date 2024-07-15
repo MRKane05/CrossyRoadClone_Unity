@@ -14,12 +14,14 @@ public class PrizeMenuHandler : MonoBehaviour {
     public GameObject alreadyOwnedLabel;
     public Sprite CharacterIcon, MoneyIcon, PowerupIcon;
     [Space]
-    [Header("Bonus Notice")]
-    public BonusNotification BonusNotice;
-    [Space]
+    [Header("Finesse Elements")]
+    public Button DoSpinButton, PlayButton;
+    public GameObject InsufficentCoinsNotice;
+    public TextMeshProUGUI InsufficentCoinsText;
     public AudioClip sound_SelectPrize, sound_Character, sound_Powerup, sound_Cash;
 
     AudioSource ourAudio;
+    string UnlockedCharcter = "";
 
     bool bPrizeRunning = false;
     public void Start()
@@ -35,13 +37,23 @@ public class PrizeMenuHandler : MonoBehaviour {
         displayArea.SetActive(false);
         alreadyOwnedLabel.SetActive(false);
         Time.timeScale = 1f;    //Set our time scale just in case it got screwy with the menu
+
+        //We need to look at what our current setup is and disable buttons as necessary/show notices
+        UnlockedCharcter = "";
+        //PlayButton.interactable = false;
+        DoSpinButton.interactable = GameStateControllerScript.Instance.coins > 100;
+        InsufficentCoinsNotice.SetActive(GameStateControllerScript.Instance.coins < 100);
+        if (GameStateControllerScript.Instance.coins < 100)
+        {
+            InsufficentCoinsText.text = "Not enough coins\nyou need " + (100 - GameStateControllerScript.Instance.coins) + " more";
+        }
     }
 
     public void PlayPrizeMachine()
     { 
         if (!bPrizeRunning)
         {
-            GameStateControllerScript.Instance.ChangeCoinTotal(-100);
+            GameStateControllerScript.Instance.ChangeCoinTotal(100);
             OpenMenu(); //reset everything to our default state
             StartCoroutine(DoPrizeMachine());
         }
@@ -97,15 +109,9 @@ public class PrizeMenuHandler : MonoBehaviour {
                 {
                     if (thisCharacter.CharacterName == newPrize.CharacterName)
                     {
-                        if (thisCharacter.Unlocked)
-                        {
-                            //We need to go onto the money display route
-                        }
-                        else
-                        {
-                            //thisCharacter.Unlocked = true;  //Unlock this character for our player
-                            GameStateControllerScript.Instance.SetCharacterLockState(thisCharacter.CharacterName, true);
-                        }
+                        //thisCharacter.Unlocked = true;  //Unlock this character for our player
+                        GameStateControllerScript.Instance.SetCharacterLockState(thisCharacter.CharacterName, true);
+                        UnlockedCharcter = thisCharacter.CharacterName;
                     }
                 }
             }
@@ -118,9 +124,19 @@ public class PrizeMenuHandler : MonoBehaviour {
             alreadyOwnedLabel.transform.DOPunchScale(Vector3.one * 1.5f, 0.75f);
             GameStateControllerScript.Instance.ChangeCoinTotal(75); //Give our player 75 coins
         }
-
+        //PlayButton.interactable = true; // UnlockedCharcter == "" ? false : true;    //Set our play button depending on what we got
         //We'd be wise to save at this point also
         SaveScoreUtility.Instance.SaveGameInformation();
         bPrizeRunning = false; //Free up our system for re-use
+    }
+
+    public void PlayWithNewCharacter()
+    {
+        if (UnlockedCharcter != "")
+        {
+            GameStateControllerScript.Instance.SelectCharacter(UnlockedCharcter);
+        }
+        GameStateControllerScript.Instance.SelectPrizeMenu(false);
+        GameStateControllerScript.Instance.Play();
     }
 }

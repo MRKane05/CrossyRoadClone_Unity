@@ -124,6 +124,8 @@ public class GameStateControllerScript : MonoBehaviour {
 
         bPassedHalfway = false;
         bBeatTopScore = false;
+
+        optionsMenu.SetActive(true); //Turn this on so that our prefs can take effect
     }
 
     public void Update() {
