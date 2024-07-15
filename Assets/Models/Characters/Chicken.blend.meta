@@ -38,6 +38,7 @@ ModelImporter:
     100064: pasted__pCube1
     100066: Sheep
     100068: WhiteLaama
+    100070: crossy_road_chartches_002
     400000: //RootNode
     400002: Chicken
     400004: Chicken_001
@@ -73,6 +74,7 @@ ModelImporter:
     400064: pasted__pCube1
     400066: Sheep
     400068: WhiteLaama
+    400070: crossy_road_chartches_002
     2100000: Black
     2100002: Orange
     2100004: White
@@ -123,6 +125,11 @@ ModelImporter:
     2100094: lambert5_001
     2100096: lambert4_001
     2100098: LaamaPack__chartches_png
+    2100100: Unicornwhite
+    2100102: UnicornBlack
+    2100104: UnicornAlt
+    2100106: UnicornPink
+    2100108: UnicornMaine
     2300000: //RootNode
     2300002: Chicken
     2300004: Chicken_001
@@ -156,6 +163,7 @@ ModelImporter:
     2300060: pasted__pCube1
     2300062: Sheep
     2300064: WhiteLaama
+    2300066: crossy_road_chartches_002
     3300000: //RootNode
     3300002: Chicken
     3300004: Chicken_001
@@ -189,6 +197,7 @@ ModelImporter:
     3300060: pasted__pCube1
     3300062: Sheep
     3300064: WhiteLaama
+    3300066: crossy_road_chartches_002
     4300000: Chicken
     4300002: Chicken_001
     4300004: Shadow
@@ -221,6 +230,7 @@ ModelImporter:
     4300058: crossy_road_chartches_001
     4300060: BrownLaama
     4300062: WhiteLaama
+    4300064: crossy_road_chartches_002
     7400000: Default Take
     9500000: //RootNode
   externalObjects: {}

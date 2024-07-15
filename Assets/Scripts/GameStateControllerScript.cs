@@ -145,7 +145,7 @@ public class GameStateControllerScript : MonoBehaviour {
             {
                 _score = score;
                 playScore.text = score.ToString();
-                if (score > score_top)
+                if (score > score_top && score_top > 0)
                 {
                     if (!bBeatTopScore)
                     {
@@ -158,7 +158,7 @@ public class GameStateControllerScript : MonoBehaviour {
                     topScore.text = score_top.ToString();
                     topScore.transform.DOPunchScale(Vector3.one * 0.2f, 0.5f);  //This is big! We set our top score!
                 }
-                if (score > score_top / 2f)
+                if (score > score_top / 2f && score_top > 0)
                 {
                     if (!bPassedHalfway)
                     {
@@ -169,7 +169,7 @@ public class GameStateControllerScript : MonoBehaviour {
                 }
                 if (score > passedIntiger * 25)
                 {
-                    int coinReward = 5 * passedIntiger;
+                    int coinReward = 3 * passedIntiger;
                     playNotification.DisplayRect("passed " + passedIntiger * 25 + "\n get " + coinReward);
                     ChangeCoinTotal(coinReward);
                 }
