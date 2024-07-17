@@ -3,6 +3,8 @@ using System.Collections;
 using DG.Tweening;
 
 public class PlayerMovementScript : MonoBehaviour {
+    public enum enDieType { NULL, CAR, TRAIN, WATER, EAGLE}
+
     public GameStateControllerScript gameStateController;
 
     public bool canMove = false;
@@ -35,10 +37,17 @@ public class PlayerMovementScript : MonoBehaviour {
     AudioSource ourAudio;
     public AudioClip SFX_Jump;
     public AudioClip SFX_Hit;
+    public AudioClip SFX_HitSide;
     public AudioClip SFX_Drown;
 
     //private GameStateControllerScript gameStateController;
     private int score;
+
+    public GameObject EquippedPowerup;
+
+    public AnimationCurve tossHeightCurve = new AnimationCurve();
+    float tossHeight = 12;
+    bool bDoingToss = false;
 
     public void SetCharacter(GameObject thisCharacter)
     {
@@ -56,6 +65,45 @@ public class PlayerMovementScript : MonoBehaviour {
     void Awake()
     {
         DOTween.Init();
+    }
+
+    public void EquipPowerup(GameObject newPowerup)
+    {
+        //This could be 2x coins, hampster ball, or anything else. I'll have to have some method of figuring out what the powerups do and their effects
+    }
+
+    public void TossCharacter(Vector3 startPosition, float tossDistance)
+    {
+        if (!bDoingToss)
+        {
+            //We need some sort of throw animation...
+            StartCoroutine(doCharacterToss(startPosition, tossDistance));
+        }
+    }
+
+    public IEnumerator doCharacterToss(Vector3 startPosition, float tossDistance)
+    {
+        bDoingToss = true;
+        startPosition = makeModal(startPosition);
+        Vector3 endPosition = startPosition + Vector3.forward * tossDistance;
+        endPosition = makeModal(endPosition);
+        yield return null;
+        float startTime = Time.time;
+        float tossDuration = 1f;
+        float lastLockPosition = startPosition.z;
+        while (Time.time-startTime < tossDuration)
+        {
+            float positionLerp = Mathf.Clamp01((Time.time - startTime) / tossDuration);
+            transform.position = Vector3.Lerp(startPosition, endPosition, positionLerp);
+            transform.position += Vector3.up * tossHeight * tossHeightCurve.Evaluate(positionLerp);
+            if (transform.position.z- lastLockPosition >= 3) {
+                lastLockPosition = transform.position.z;
+                ValidateMoveAndMap();
+            }
+            yield return null;
+        }
+        transform.position = endPosition;
+        bDoingToss = false;
     }
 
     public void Start() {
@@ -171,8 +219,9 @@ public class PlayerMovementScript : MonoBehaviour {
         }
     }
 
-    private void Move(Vector3 distance) {
-        if (GameStateControllerScript.Instance.state != GameStateControllerScript.enGameState.PLAY) { return; } //Don't let the player move if we're not in play mode
+    public bool Move(Vector3 distance) {
+        if (GameStateControllerScript.Instance.state != GameStateControllerScript.enGameState.PLAY) { return false; } //Don't let the player move if we're not in play mode
+        if (bDoingToss) { return false; } //Don't let the player move while they're being tossed
         //Debug.Log("In Distance: " + distance);
         //So if we're rotated we'll have to rotate our movement direction...
         switch (GameStateControllerScript.Instance.ScreenOrientation)
@@ -202,7 +251,7 @@ public class PlayerMovementScript : MonoBehaviour {
         if (Physics.CheckSphere(newPosition + new Vector3(0.0f, 0.5f, 0.0f), 0.1f, stopperLayerMask))
         {
             Debug.Log("Got Collision With Move");
-            return;
+            return false;
         }
 
         target = newPosition;
@@ -229,6 +278,7 @@ public class PlayerMovementScript : MonoBehaviour {
         gameObject.transform.DOMove(targetPosition, stepTime).SetEase(Ease.Linear).OnComplete(() => ValidateMoveAndMap());
 
         PlaySound(SFX_Jump);
+        return true;
     }
 
     void ValidateMoveAndMap()
@@ -276,23 +326,56 @@ public class PlayerMovementScript : MonoBehaviour {
         }
     }
 
-    public void GameOver(bool bPlayDieSound, bool bPlayDrownSound) {
+    float powerupInvincibleStart = 0;
+
+    public void GameOver(enDieType DieType) {
+        if (bDoingToss) { return; } //Don't let our character die while we're being tossed
+        /*
+        if (Time.time - powerupInvincibleStart < 0.5f)
+        {
+            return; //Don't kill our player as we've got a grace window
+        }*/
+
+            //We need to see if we've got an enabled powerup and if it has any effect here
+        if (EquippedPowerup)
+        {
+            Powerup thisPowerup = EquippedPowerup.GetComponent<Powerup>();
+            if (thisPowerup.PowerupType == Powerup.enPowerupType.ONHIT)
+            {   //Pass this handling to the powerup
+                bool bPowerupEffective = thisPowerup.GameOver(gameObject, DieType);
+                if (bPowerupEffective)
+                {
+                    powerupInvincibleStart = Time.time;
+                    Debug.Log("Doing Powerup Escape");
+                    return; //Don't complete the rest of our code as it'll be handled by the powerup
+                }
+            }
+        }
+        
         // When game over, disable moving.
         canMove = false;
 
         // Call GameOver at game state controller (instead of sending messages).
-        //gameStateController.GameOver();
         gameStateController.GameOver();
 
         //We need to figure out how we died to play the correct sound. For instance: was this drowning?
-        if (bPlayDieSound)
+        if (DieType == enDieType.CAR)
         {
+            //We should vary this for the case where we jump into the vehicle
+            //killMoveTween();
+            Vector3 scale = transform.localScale;
+            transform.localScale = new Vector3(scale.x, scale.y * 0.1f, scale.z);
             PlaySound(SFX_Hit);
         }
-        if (bPlayDrownSound)
+        if (DieType == enDieType.WATER)
         {
             PlaySound(SFX_Drown);
         }
+    }
+
+    public void killMoveTween()
+    {
+        transform.DOKill();
     }
 
     public void Reset() {

@@ -40,7 +40,7 @@ public class EagleScript : MonoBehaviour {
             PlayerMovementScript PlayerMove = other.GetComponent<PlayerMovementScript>();
             if (PlayerMove)
             {
-                PlayerMove.GameOver(false, false);
+                PlayerMove.GameOver(PlayerMovementScript.enDieType.EAGLE);
             }
             other.gameObject.SetActive(false); //turn our player off so that it looks like it's been snatched
         }

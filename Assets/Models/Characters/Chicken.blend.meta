@@ -39,6 +39,9 @@ ModelImporter:
     100066: Sheep
     100068: WhiteLaama
     100070: crossy_road_chartches_002
+    100072: Catapult
+    100074: LauncherA
+    100076: LauncherB
     400000: //RootNode
     400002: Chicken
     400004: Chicken_001
@@ -75,6 +78,9 @@ ModelImporter:
     400066: Sheep
     400068: WhiteLaama
     400070: crossy_road_chartches_002
+    400072: Catapult
+    400074: LauncherA
+    400076: LauncherB
     2100000: Black
     2100002: Orange
     2100004: White
@@ -130,6 +136,8 @@ ModelImporter:
     2100104: UnicornAlt
     2100106: UnicornPink
     2100108: UnicornMaine
+    2100110: Wood
+    2100112: Rock
     2300000: //RootNode
     2300002: Chicken
     2300004: Chicken_001
@@ -164,6 +172,9 @@ ModelImporter:
     2300062: Sheep
     2300064: WhiteLaama
     2300066: crossy_road_chartches_002
+    2300068: Catapult
+    2300070: LauncherA
+    2300072: LauncherB
     3300000: //RootNode
     3300002: Chicken
     3300004: Chicken_001
@@ -198,6 +209,9 @@ ModelImporter:
     3300062: Sheep
     3300064: WhiteLaama
     3300066: crossy_road_chartches_002
+    3300068: Catapult
+    3300070: LauncherA
+    3300072: LauncherB
     4300000: Chicken
     4300002: Chicken_001
     4300004: Shadow
@@ -231,6 +245,9 @@ ModelImporter:
     4300060: BrownLaama
     4300062: WhiteLaama
     4300064: crossy_road_chartches_002
+    4300066: LauncherB
+    4300068: LauncherA
+    4300070: Catapult
     7400000: Default Take
     9500000: //RootNode
   externalObjects: {}

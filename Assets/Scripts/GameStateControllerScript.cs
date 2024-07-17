@@ -8,6 +8,16 @@ using DG.Tweening;
 
 using static CanvasRotator;
 
+[System.Serializable]
+public class Powerup_Item
+{
+    public string PowerupName = "";
+    public GameObject powerupPrefab;
+    public int powerupCost = 125;
+    public int count = 0;
+    public bool bEnabledThisRun = false;
+}
+
 
 [System.Serializable]
 public class SelectableCharacter
@@ -28,7 +38,7 @@ public class CharacterGroup
 public class GameStateControllerScript : MonoBehaviour {
 
     public List<CharacterGroup> CharacterGroups = new List<CharacterGroup>();
-
+    public List<Powerup_Item> PowerupItems = new List<Powerup_Item>();
     public static GameStateControllerScript Instance { get; private set; }
     public CanvasRotator canvasRotator;
 
@@ -40,6 +50,7 @@ public class GameStateControllerScript : MonoBehaviour {
     public GameObject optionsMenu;
     public GameObject characterSelect;
     public GameObject prizeMenu;
+    public GameObject powerupMenu;
 
     public BonusNotification playNotification;
 
@@ -55,7 +66,7 @@ public class GameStateControllerScript : MonoBehaviour {
     public Text CoinsDisplay;
 
     private GameObject currentCanvas;
-    public enum enGameState { NULL, MAINMENU, PLAY, GAMEOVER, OPTIONS, CHARACTERSELECT, PRIZEMENU }
+    public enum enGameState { NULL, MAINMENU, PLAY, GAMEOVER, OPTIONS, CHARACTERSELECT, PRIZEMENU, POWERUPMENU }
     public enGameState state = enGameState.MAINMENU;
     enGameState prepause_state = enGameState.MAINMENU;
 
@@ -209,10 +220,14 @@ public class GameStateControllerScript : MonoBehaviour {
         state = enGameState.PLAY;// "play";
         score = 0;
 
-        LevelControllerScript.Instance.player.GetComponent<PlayerMovementScript>().canMove = true;
-        LevelControllerScript.Instance.camera.GetComponent<CameraMovementScript>().moving = true;
-        //GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerMovementScript>().canMove = true;
-        //GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovementScript>().moving = true;
+        //LevelControllerScript.Instance.player.GetComponent<PlayerMovementScript>().canMove = true;
+        //LevelControllerScript.Instance.camera.GetComponent<CameraMovementScript>().moving = true;
+
+        //Need to talk to our powerup handler and see if we've got powerups selected, and if so pass that information through to our level controller
+        List<string> equippedPowerups = PowerupHandler.Instance.getEquippedPowerups();
+        Debug.Log("Equipped Powerups: " + equippedPowerups.Count);
+        //LevelControllerScript.Instance.setPowerups(equippedPowerups);
+        LevelControllerScript.Instance.Play();
     }
 
     public void GameOver() {
@@ -288,7 +303,24 @@ public class GameStateControllerScript : MonoBehaviour {
         {
             state = prepause_state; //Return to whatever we were :)
         }
+    }
 
+    public void SelectPowerupMenu(bool doOpen)
+    {
+        Time.timeScale = doOpen ? 0.001f : 1f;  //Pause our game
+        powerupMenu.SetActive(doOpen);
+
+        if (doOpen)
+        {
+            prepause_state = state; //So we know what to come back to
+            state = enGameState.PRIZEMENU;
+            //powerupMenu.GetComponent<PowerupMenuItem>().OpenMenu();
+            gameObject.GetComponent<PowerupHandler>().OpenMenu();
+        }
+        else
+        {
+            state = prepause_state; //Return to whatever we were :)
+        }
     }
 
     private GameObject CurrentCanvas {

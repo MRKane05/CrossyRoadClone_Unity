@@ -23,7 +23,7 @@ public class WaterSplashScript : MonoBehaviour {
             Destroy(o, splashLifetime);
 
             //other.SendMessage("GameOver");
-            other.GetComponent<PlayerMovementScript>().GameOver(false, true);
+            other.GetComponent<PlayerMovementScript>().GameOver(PlayerMovementScript.enDieType.WATER);
         }
     }
 
