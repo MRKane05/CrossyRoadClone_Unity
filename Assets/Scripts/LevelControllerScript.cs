@@ -35,6 +35,7 @@ public class LevelControllerScript : MonoBehaviour {
     int nextPowerupLine = 0;
     int maxPowerupSpread = 0;
     int powerupRandom = 0;
+
     void Awake()
     {
         if (Instance == null)
@@ -70,7 +71,7 @@ public class LevelControllerScript : MonoBehaviour {
 
         if (equippedPowerups.Count > 0)
         {
-            maxPowerupSpread = Mathf.FloorToInt((float)GameStateControllerScript.Instance.score_top / equippedPowerups.Count);
+            maxPowerupSpread = Mathf.FloorToInt(((float)GameStateControllerScript.Instance.score_top / equippedPowerups.Count) * Random.Range(1.5f, 2f)); //Make our spread a little more trying
         }
         //Unlock and set everything in action :)
         player.GetComponent<PlayerMovementScript>().canMove = true;
@@ -84,6 +85,7 @@ public class LevelControllerScript : MonoBehaviour {
             int PowerupReturn = TryToAddPowerup(nextPowerupLine);
             if (PowerupReturn > 0)
             {
+                maxPowerupSpread = Mathf.FloorToInt(((float)GameStateControllerScript.Instance.score_top / equippedPowerups.Count) * Random.Range(1.5f, 2f)); //Make our spread a little more trying
                 powerupRandom = Mathf.Max(minPowerupSpacing, Random.RandomRange(minPowerupSpacing, maxPowerupSpread));
                 Debug.Log("Powerup Random: " + powerupRandom);
                 nextPowerupLine += powerupRandom;
@@ -200,6 +202,7 @@ public class LevelControllerScript : MonoBehaviour {
                 int PowerupReturn = TryToAddPowerup(nextPowerupLine);
                 if (PowerupReturn > 0)
                 {
+                    maxPowerupSpread = Mathf.FloorToInt(((float)GameStateControllerScript.Instance.score_top / equippedPowerups.Count) * Random.Range(1.5f, 2.5f)); //Make our spread a little more trying
                     powerupRandom = Mathf.Max(minPowerupSpacing, Random.RandomRange(minPowerupSpacing, maxPowerupSpread));
                     Debug.Log("Powerup Random: " + powerupRandom);
                     nextPowerupLine += powerupRandom;

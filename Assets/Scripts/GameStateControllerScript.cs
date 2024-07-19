@@ -226,7 +226,7 @@ public class GameStateControllerScript : MonoBehaviour {
         //Need to talk to our powerup handler and see if we've got powerups selected, and if so pass that information through to our level controller
         List<string> equippedPowerups = PowerupHandler.Instance.getEquippedPowerups();
         Debug.Log("Equipped Powerups: " + equippedPowerups.Count);
-        //LevelControllerScript.Instance.setPowerups(equippedPowerups);
+        LevelControllerScript.Instance.setPowerups(equippedPowerups);
         LevelControllerScript.Instance.Play();
     }
 
