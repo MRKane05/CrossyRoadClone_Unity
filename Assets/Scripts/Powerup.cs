@@ -21,6 +21,8 @@ public class Powerup : MonoBehaviour
 
     protected AudioSource ourAudio;
 
+    public AudioClip Sound_OnPickup, Sound_OnActivate;
+
     void Awake()
     {
         ourAudio = gameObject.GetComponent<AudioSource>();
@@ -41,6 +43,12 @@ public class Powerup : MonoBehaviour
         gameObject.transform.SetParent(playerMove.CharacterBase.transform);
         gameObject.transform.localPosition = mountOffset;
         bMounted = true;
+
+        if (ourAudio && Sound_OnPickup)
+        {
+            ourAudio.clip = Sound_OnPickup;
+            ourAudio.Play();
+        }
     }
 
     public virtual bool GameOver(GameObject PlayerCharacter, enDieType DieType)

@@ -49,6 +49,8 @@ public class PlayerMovementScript : MonoBehaviour {
     float tossHeight = 12;
     bool bDoingToss = false;
 
+    public bool bPlayerInvincible = false;
+
     public void SetCharacter(GameObject thisCharacter)
     {
         //Clear anything we might have
@@ -84,9 +86,12 @@ public class PlayerMovementScript : MonoBehaviour {
     public IEnumerator doCharacterToss(Vector3 startPosition, float tossDistance)
     {
         bDoingToss = true;
+        Debug.Log("StartPosition: " + startPosition);
         startPosition = makeModal(startPosition);
         Vector3 endPosition = startPosition + Vector3.forward * tossDistance;
         endPosition = makeModal(endPosition);
+
+        Debug.Log("EndPosition: " + endPosition);
         yield return null;
         float startTime = Time.time;
         float tossDuration = 1f;
@@ -296,10 +301,10 @@ public class PlayerMovementScript : MonoBehaviour {
     {
         if (GameStateControllerScript.Instance.ScreenOrientation == CanvasRotator.enScreenOrientation.LANDSCAPE)
         {
-            return new Vector3(newPosition.x, newPosition.y, Mathf.RoundToInt(newPosition.z / 3f) * 3f);
+            return new Vector3(newPosition.x, 1f, Mathf.RoundToInt(newPosition.z / 3f) * 3f);
         }
         //Handle our side angles
-        return new Vector3(Mathf.RoundToInt(newPosition.x / 3f) * 3f, newPosition.y, newPosition.z);
+        return new Vector3(Mathf.RoundToInt(newPosition.x / 3f) * 3f, 1f, newPosition.z);
     }
 
     public bool IsMoving {
@@ -330,13 +335,14 @@ public class PlayerMovementScript : MonoBehaviour {
 
     public void GameOver(enDieType DieType) {
         if (bDoingToss) { return; } //Don't let our character die while we're being tossed
+        if (bPlayerInvincible) { return; }
         /*
         if (Time.time - powerupInvincibleStart < 0.5f)
         {
             return; //Don't kill our player as we've got a grace window
         }*/
 
-            //We need to see if we've got an enabled powerup and if it has any effect here
+        //We need to see if we've got an enabled powerup and if it has any effect here
         if (EquippedPowerup)
         {
             Powerup thisPowerup = EquippedPowerup.GetComponent<Powerup>();

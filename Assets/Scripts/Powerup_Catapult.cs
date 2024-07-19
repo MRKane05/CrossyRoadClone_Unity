@@ -11,12 +11,14 @@ public class Powerup_Catapult : Powerup {
         startTime = Time.time;
         gameObject.GetComponent<Collider>().enabled = false; //turn off our collider
         PlayerMovementScript playerMove = playerObject.GetComponent<PlayerMovementScript>();
-        playerMove.TossCharacter(new Vector3(transform.position.x, 0, transform.position.y), 3*5);
+        //Debug.Log("TossStart: " + transform.position);
+        playerMove.TossCharacter(new Vector3(transform.position.x, 0, transform.position.z), 3*5);
         ArmDown.SetActive(false);
         ArmUp.SetActive(true);
 
-        if (ourAudio)
+        if (ourAudio && Sound_OnActivate)
         {
+            ourAudio.clip = Sound_OnActivate;
             ourAudio.Play();
         }
         bMounted = true;

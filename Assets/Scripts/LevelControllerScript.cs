@@ -24,6 +24,7 @@ public class LevelControllerScript : MonoBehaviour {
     private Vector3 playerPosition = Vector3.zero;
     private float playerHighest = 0;
     private int playerHighestRow = 0;
+    private int mapLine = 0;
 
     public List<LineHandler> SpawnedLines = new List<LineHandler>();
     [Space]
@@ -33,7 +34,7 @@ public class LevelControllerScript : MonoBehaviour {
     public int minPowerupSpacing = 7; //This is the distance we can be tossed by the catapult. The rest of the powerups will be spaced according to top score
     int nextPowerupLine = 0;
     int maxPowerupSpread = 0;
-
+    int powerupRandom = 0;
     void Awake()
     {
         if (Instance == null)
@@ -74,14 +75,24 @@ public class LevelControllerScript : MonoBehaviour {
         //Unlock and set everything in action :)
         player.GetComponent<PlayerMovementScript>().canMove = true;
         camera.GetComponent<CameraMovementScript>().moving = true;
-
+        nextPowerupLine = Mathf.Max(minPowerupSpacing, Random.RandomRange(minPowerupSpacing, maxPowerupSpread));
         //We need to add powerups until our visual lines are exhaused here, and then keep adding them as new lines are made
         while (nextPowerupLine < SpawnedLines.Count && currentPowerup < equippedPowerups.Count)
         {
-            int powerupRandom = Mathf.Max(minPowerupSpacing, Random.RandomRange(minPowerupSpacing, maxPowerupSpread));
-            nextPowerupLine += powerupRandom;
-            Debug.Log("NextPowerupLine: " + nextPowerupLine);
-            TryToAddPowerup(nextPowerupLine);
+            
+            //Debug.Log("NextPowerupLine: " + nextPowerupLine);
+            int PowerupReturn = TryToAddPowerup(nextPowerupLine);
+            if (PowerupReturn > 0)
+            {
+                powerupRandom = Mathf.Max(minPowerupSpacing, Random.RandomRange(minPowerupSpacing, maxPowerupSpread));
+                Debug.Log("Powerup Random: " + powerupRandom);
+                nextPowerupLine += powerupRandom;
+            }
+            else
+            {
+                //Move our line forward
+                nextPowerupLine++;
+            }
         }
     }
 
@@ -89,18 +100,19 @@ public class LevelControllerScript : MonoBehaviour {
     {
         if (SpawnedLines.Count < lineNumber)
         {
+            Debug.Log("Insufficient lines Spawned to drop powerup. LineNumber: " + lineNumber + " SpawnedLines: " + SpawnedLines.Count);
             return 0; //This'll get picked up later
         }
         //I want to put a cycle in to make sure we don't go adding a powerup to a water line as it's a bit unfair for the player (although fun maybe?)
         LineHandler targetLine = SpawnedLines[lineNumber];
 
-        /*
+        
         if (targetLine.LineType == LineHandler.enLineType.WATER)
         {
+            Debug.Log("Powerup line aborted due to being water");
             return 0;
         }
-        return 1;
-        */
+        Debug.LogError("Powerup Dropped on Line: " + lineNumber);
         string targetPowerup = equippedPowerups[currentPowerup];
         currentPowerup++;
         //We need to get the powerup we'll be using
@@ -113,14 +125,14 @@ public class LevelControllerScript : MonoBehaviour {
                 Vector3 position = Vector3.zero;
                 while (!bCleared && cycles > 0)
                 {
-                    position = new Vector3(Random.RandomRange(-9.5f, 9.5f), 0.77f, 0);  //We'll have to have some height stuff sorted out here
+                    position = new Vector3(Random.RandomRange(-9.5f, 9.5f), 0f, targetLine.gameObject.transform.position.z);  //We'll have to have some height stuff sorted out here
                     if (!Physics.CheckSphere(position, 0.1f, stopperLayerMask))
                     {
                         bCleared = true;
                     }
                     cycles--;
                 }
-                GameObject newCoin = Instantiate(thisPowerup.powerupPrefab, targetLine.gameObject.transform);
+                GameObject newCoin = Instantiate(thisPowerup.powerupPrefab);
                 Debug.Log("Added powerup: " + thisPowerup.PowerupName);
                 //newCoin.transform.localScale = Vector3.one;
                 newCoin.transform.localPosition = position;	//Who cares if it gets stuck in a tree or something
@@ -160,19 +172,44 @@ public class LevelControllerScript : MonoBehaviour {
 
     public void SpawnInitialMap()
     {
+        mapLine = 0;
         for (int i=1; i<lineAhead+1; i++)
         {
             AddNewMapLine(i * 3);
+            mapLine = i;
         }
     }
 
     public void PlayerMoved()
     {
-        if (player.transform.position.z > playerHighest) {  //we've moved forward\
-            playerHighest = player.transform.position.z;
-            playerHighestRow = Mathf.FloorToInt(playerHighest / 3f);
+        //if (player.transform.position.z > playerHighest) {  //we've moved forward\
+        playerHighest = Mathf.Max(playerHighest, player.transform.position.z);
+        playerHighestRow = Mathf.FloorToInt(playerHighest / 3f);
 
-            AddNewMapLine((playerHighestRow + lineAhead) * 3);
+        while (mapLine < playerHighestRow + lineAhead) { 
+
+            AddNewMapLine((mapLine) * 3);
+            mapLine++;
+
+            //Seee if we can drop a powerup on this line
+            if (SpawnedLines.Count - 1 > nextPowerupLine && currentPowerup < equippedPowerups.Count)
+            {
+                
+                //nextPowerupLine += powerupRandom;
+                Debug.Log("NextPowerupLine: " + nextPowerupLine);
+                int PowerupReturn = TryToAddPowerup(nextPowerupLine);
+                if (PowerupReturn > 0)
+                {
+                    powerupRandom = Mathf.Max(minPowerupSpacing, Random.RandomRange(minPowerupSpacing, maxPowerupSpread));
+                    Debug.Log("Powerup Random: " + powerupRandom);
+                    nextPowerupLine += powerupRandom;
+                }
+                else
+                {
+                    Debug.Log("Moved Line Forward");
+                    nextPowerupLine++;
+                }
+            }
         }
     }
 
@@ -183,8 +220,6 @@ public class LevelControllerScript : MonoBehaviour {
 
     public void AddNewMapLine(float newPosition)
     {
-
-
         Vector3 targetPosition = new Vector3(0, 0, newPosition);
         GameObject selectedPrefab = linePrefabs[Random.Range(0, linePrefabs.Length)];
         GameObject newline = Instantiate(selectedPrefab, targetPosition, Quaternion.identity) as GameObject;

@@ -11,6 +11,12 @@ public class Powerup_HampsterBall : Powerup {
     {
         startTime = Time.time;
         pulseTime = Time.time;
+
+        if (ourAudio && Sound_OnPickup)
+        {
+            ourAudio.clip = Sound_OnPickup;
+            ourAudio.Play();
+        }
     }
 
     public override bool GameOver(GameObject PlayerCharacter, enDieType DieType)
@@ -24,8 +30,10 @@ public class Powerup_HampsterBall : Powerup {
         //Technically we could just call a backward move
         bool bEscaped = playerMove.Move(new Vector3(0, 0, -3));
         RemovePowerup();
-        if (ourAudio)
+
+        if (ourAudio && Sound_OnActivate)
         {
+            ourAudio.clip = Sound_OnActivate;
             ourAudio.Play();
         }
         return bEscaped;
