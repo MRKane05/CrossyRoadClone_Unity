@@ -5,6 +5,8 @@ using UnityEngine;
 public class PowerupHandler : MonoBehaviour {
 	public static PowerupHandler Instance { get; private set; }
 
+    public List<Powerup_Item> PowerupItems = new List<Powerup_Item>();
+
     public GameObject powerupDisplayArea, selectedPowerupsBase;
 
     public GameObject powerupItem, equippedPowerupItem;
@@ -47,11 +49,21 @@ public class PowerupHandler : MonoBehaviour {
         }
 
         //Now go through and assign our powerup buttons
-        foreach(Powerup_Item powerup in GameStateControllerScript.Instance.PowerupItems)
+        foreach(Powerup_Item powerup in PowerupItems)
         {
             GameObject newPowerupButton = Instantiate(powerupItem, powerupDisplayArea.transform);
             PowerupMenuItem powerupButton = newPowerupButton.GetComponent<PowerupMenuItem>();
-            powerupButton.setupButton(powerup.PowerupName, powerup.count, powerup.powerupPrefab);
+            //We need to get our count information from the GameStateController
+            int count = 0;
+            foreach (Powerup_Item thisPowerup in GameStateControllerScript.Instance.PowerupItems)
+            {
+                if (powerup.PowerupName == thisPowerup.PowerupName)
+                {
+                    count = thisPowerup.count;
+                }
+            }
+
+            powerupButton.setupButton(powerup.PowerupName, count, powerup.powerupCost, powerup.powerupPrefab);
         }
     }
 

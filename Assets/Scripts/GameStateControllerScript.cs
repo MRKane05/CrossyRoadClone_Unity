@@ -16,6 +16,12 @@ public class Powerup_Item
     public int powerupCost = 125;
     public int count = 0;
     public bool bEnabledThisRun = false;
+
+    public Powerup_Item(string newPowerupName, int newPowerupCount)
+    {
+        PowerupName = newPowerupName;
+        count = newPowerupCount;
+    }
 }
 
 
@@ -220,13 +226,19 @@ public class GameStateControllerScript : MonoBehaviour {
         state = enGameState.PLAY;// "play";
         score = 0;
 
-        //LevelControllerScript.Instance.player.GetComponent<PlayerMovementScript>().canMove = true;
-        //LevelControllerScript.Instance.camera.GetComponent<CameraMovementScript>().moving = true;
+        
 
         //Need to talk to our powerup handler and see if we've got powerups selected, and if so pass that information through to our level controller
         List<string> equippedPowerups = PowerupHandler.Instance.getEquippedPowerups();
         Debug.Log("Equipped Powerups: " + equippedPowerups.Count);
         LevelControllerScript.Instance.setPowerups(equippedPowerups);
+
+        //We need to go through our equipped powerups and remove them from our internal count register
+        foreach (string powerupName in equippedPowerups)
+        {
+            ChangePowerupCount(powerupName, -1);
+        }
+
         LevelControllerScript.Instance.Play();
     }
 
@@ -360,6 +372,17 @@ public class GameStateControllerScript : MonoBehaviour {
         coins += byThis;
         PlayerPrefs.SetInt("Coins", coins); //Update our new prefs
         SetCoinsDisplay(coins);
+    }
+
+    public void ChangePowerupCount(string itemName, int countChange)
+    {
+        foreach(Powerup_Item thisPowerup in PowerupItems)
+        {
+            if (thisPowerup.PowerupName == itemName)
+            {
+                thisPowerup.count += countChange;
+            }
+        }
     }
 
     public void SetCoinsDisplay(int toThis)

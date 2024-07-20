@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
+using DG.Tweening;
 
 public class PowerupMenuItem : MonoBehaviour {
     public TextMeshProUGUI ItemTitle;
@@ -9,6 +11,9 @@ public class PowerupMenuItem : MonoBehaviour {
     [HideInInspector]
     public string itemName = "";
     public int itemCount = 0;
+    public int itemCost = 150;
+
+    public Button purchaseButton;
 
     public void returnPowerup()
     {
@@ -16,18 +21,22 @@ public class PowerupMenuItem : MonoBehaviour {
         setButtonText(itemName, itemCount);
     }
 
-    public void setupButton(string newTitle, int newItemCount, GameObject newDisplayModel)
+    public void setupButton(string newTitle, int newItemCount, int newPowerupCost, GameObject newDisplayModel)
     {
         itemName = newTitle;
         itemCount = newItemCount;
+        itemCost = newPowerupCost;
         setButtonText(newTitle, itemCount);
         if (newDisplayModel)
         {
             GameObject newModel = Instantiate(newDisplayModel, itemDisplayPosition.transform);
+            newModel.transform.localPosition = Vector3.one;
             //newModel.transform.localScale = Vector3.one;
             newModel.transform.localEulerAngles = Vector3.zero;
             //newModel.transform.localPosition = Vector3.zero;
         }
+
+        purchaseButton.interactable = GameStateControllerScript.Instance.coins > itemCost;
     }
 
     //Because we'll be changing the count attached to this
@@ -38,8 +47,12 @@ public class PowerupMenuItem : MonoBehaviour {
 
     public void AddPowerupToStack()
     {
+        purchaseButton.interactable = GameStateControllerScript.Instance.coins > itemCost;
         if (itemCount <=0) {
-            Debug.Log("bring up buy powerup menu");
+            if (GameStateControllerScript.Instance.coins > itemCost)
+            {
+                purchaseButton.transform.DOShakeScale(0.75f).SetUpdate(true).OnComplete(() => { purchaseButton.transform.localScale = Vector3.one; });
+            }
             return; 
         }  //Don't add if we've got too few
 
@@ -51,5 +64,23 @@ public class PowerupMenuItem : MonoBehaviour {
             //Update our title
             setButtonText(itemName, itemCount);
         }
+    }
+
+    public void buyPowerup()
+    {
+        //We need to check and see if we've got enough money, probably doesn't matter where this action happens...
+        if (GameStateControllerScript.Instance.coins < itemCost)
+        {
+            purchaseButton.interactable = false;
+            return;
+        }
+
+        //otherwise...
+        itemCount++;
+        setButtonText(itemName, itemCount);
+
+        //Update our GameStateController about it...
+        GameStateControllerScript.Instance.ChangeCoinTotal(-itemCost);
+        GameStateControllerScript.Instance.ChangePowerupCount(itemName, 1);
     }
 }
