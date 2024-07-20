@@ -136,8 +136,10 @@ public class GameStateControllerScript : MonoBehaviour {
         SetScreenOrientation(ScreenOrientation);
 
         //Load our prefs details
+        /*
         coins = PlayerPrefs.GetInt("Coins");
         score_top = PlayerPrefs.GetInt("TopScore"); //Retrieve our top score
+        */
         topScore.text = score_top.ToString();
         SetCoinsDisplay(coins);
         playScore.text = "0";   //Set our scores
@@ -171,7 +173,7 @@ public class GameStateControllerScript : MonoBehaviour {
                         ChangeCoinTotal(25);
                     }
                     score_top = score;
-                    PlayerPrefs.SetInt("TopScore", score_top);
+                    //PlayerPrefs.SetInt("TopScore", score_top);
                     topScore.text = score_top.ToString();
                     topScore.transform.DOPunchScale(Vector3.one * 0.2f, 0.5f).OnComplete(() => { topScore.transform.localScale = Vector3.one; }); ;  //This is big! We set our top score!
                 }
@@ -255,6 +257,7 @@ public class GameStateControllerScript : MonoBehaviour {
         }
         LevelControllerScript.Instance.camera.GetComponent<CameraMovementScript>().moving = false;
         //GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovementScript>().moving = false;
+        SaveScoreUtility.Instance.SaveGameInformation();
     }
 
     public void SelectOptions(bool doOpen)
@@ -368,9 +371,9 @@ public class GameStateControllerScript : MonoBehaviour {
 
     public void ChangeCoinTotal(int byThis)
     {
-        Debug.Log("Changing Coin Total: " + byThis);   
+        //Debug.Log("Changing Coin Total: " + byThis);   
         coins += byThis;
-        PlayerPrefs.SetInt("Coins", coins); //Update our new prefs
+        //PlayerPrefs.SetInt("Coins", coins); //Update our new prefs
         SetCoinsDisplay(coins);
     }
 
@@ -388,6 +391,6 @@ public class GameStateControllerScript : MonoBehaviour {
     public void SetCoinsDisplay(int toThis)
     {
         CoinsDisplay.text = toThis.ToString();
-        CoinsDisplay.transform.DOPunchScale(Vector3.one * 0.25f, 0.75f).OnComplete(() => { CoinsDisplay.transform.localScale = Vector3.one; }); //To show that we've got something :)
+        CoinsDisplay.transform.DOPunchScale(Vector3.one * 0.25f, 0.75f).SetUpdate(true).OnComplete(() => { CoinsDisplay.transform.localScale = Vector3.one; }); //To show that we've got something :)
     }
 }

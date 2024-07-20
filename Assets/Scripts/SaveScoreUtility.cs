@@ -35,6 +35,8 @@ public class SaveGameInformation
 {
 	public List<CharacterSaveInformation> CharacterSaves = new List<CharacterSaveInformation>();
 	public List<PowerupSaveInformation> PowerupSaves = new List<PowerupSaveInformation>();
+	public int Coins = 0;
+	public int TopScore = 0;
 }
 
 
@@ -94,6 +96,10 @@ public class SaveScoreUtility : MonoBehaviour
     {
 		//SaveCharacterInformation newSaveCharacter = new SaveCharacterInformation(true);
 		GameSaveInformation = new SaveGameInformation();
+
+		GameSaveInformation.Coins = GameStateControllerScript.Instance.coins;
+		GameStateControllerScript.Instance.SetCoinsDisplay(GameSaveInformation.Coins);
+		GameSaveInformation.TopScore = GameStateControllerScript.Instance.score_top;
 
 		foreach (CharacterGroup characterGroup in GameStateControllerScript.Instance.CharacterGroups)
 		{
@@ -182,6 +188,8 @@ public class SaveScoreUtility : MonoBehaviour
 
 	public void PopulateGameStateControllerFromSave()
     {
+		GameStateControllerScript.Instance.coins = GameSaveInformation.Coins;
+		GameStateControllerScript.Instance.score_top = GameSaveInformation.TopScore;
 
 		Debug.Log("Populating Saves");
 		foreach (CharacterGroup characterGroup in GameStateControllerScript.Instance.CharacterGroups)
