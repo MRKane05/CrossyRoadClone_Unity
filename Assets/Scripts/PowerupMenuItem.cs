@@ -68,6 +68,10 @@ public class PowerupMenuItem : MonoBehaviour {
 
     public void buyPowerup()
     {
+        PowerupHandler.Instance.BuyPowerup(itemName, this);
+    }
+
+    public void oldBuyPowerup() { 
         //We need to check and see if we've got enough money, probably doesn't matter where this action happens...
         if (GameStateControllerScript.Instance.coins < itemCost)
         {
@@ -82,5 +86,11 @@ public class PowerupMenuItem : MonoBehaviour {
         //Update our GameStateController about it...
         GameStateControllerScript.Instance.ChangeCoinTotal(-itemCost);
         GameStateControllerScript.Instance.ChangePowerupCount(itemName, 1);
+    }
+
+    public void ChangeCount(int changeAmount)
+    {
+        itemCount += changeAmount;
+        setButtonText(itemName, itemCount);
     }
 }

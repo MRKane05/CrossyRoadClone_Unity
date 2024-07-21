@@ -12,6 +12,7 @@ public class PlayerMovementScript : MonoBehaviour {
     float stepTime = 0.3f;
 
     public Animation HopAnimator;
+    public AnimationClip HopStandard, HopFast;
     public GameObject CharacterBase;    //What our prefab character will be spawned on (logically)
     public GameObject DefaultCharacter;
 
@@ -51,6 +52,7 @@ public class PlayerMovementScript : MonoBehaviour {
 
     public bool bPlayerInvincible = false;
 
+    float AnimationFramerate = 30;
     public void SetCharacter(GameObject thisCharacter)
     {
         //Clear anything we might have
@@ -113,6 +115,8 @@ public class PlayerMovementScript : MonoBehaviour {
 
     public void Start() {
         ourAudio = gameObject.GetComponent<AudioSource>();
+        AnimationFramerate = HopAnimator.clip.frameRate;
+        setTimeScale(1f);
         SetCharacter(DefaultCharacter);
 
         current = transform.position;
@@ -280,10 +284,22 @@ public class PlayerMovementScript : MonoBehaviour {
        
         HopAnimator.Stop(); //To give us a clean reset
         HopAnimator.Play();
-        gameObject.transform.DOMove(targetPosition, stepTime).SetEase(Ease.Linear).OnComplete(() => ValidateMoveAndMap());
+        //HopAnimator.clip.frameRate = HopAnimator.clip.frameRate / Time.timeScale;
+        gameObject.transform.DOMove(targetPosition, stepTime).SetEase(Ease.Linear).SetUpdate(true).OnComplete(() => ValidateMoveAndMap());
 
         PlaySound(SFX_Jump);
         return true;
+    }
+
+    public void setTimeScale(float newTimeScale)
+    {
+        if (newTimeScale == 1)
+        {
+            HopAnimator.clip = HopStandard;
+        } else
+        {
+            HopAnimator.clip = HopFast;
+        }
     }
 
     void ValidateMoveAndMap()

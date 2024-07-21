@@ -12,6 +12,7 @@ using static CanvasRotator;
 public class Powerup_Item
 {
     public string PowerupName = "";
+    public string PowerupDescription = "";
     public GameObject powerupPrefab;
     public int powerupCost = 125;
     public int count = 0;
@@ -386,6 +387,12 @@ public class GameStateControllerScript : MonoBehaviour {
                 thisPowerup.count += countChange;
             }
         }
+    }
+
+    public void setCoinTotal(int toThis)
+    {
+        coins = toThis;
+        SetCoinsDisplay(toThis);
     }
 
     public void SetCoinsDisplay(int toThis)

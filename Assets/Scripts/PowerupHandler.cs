@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class PowerupHandler : MonoBehaviour {
 	public static PowerupHandler Instance { get; private set; }
@@ -12,6 +13,11 @@ public class PowerupHandler : MonoBehaviour {
     public GameObject powerupItem, equippedPowerupItem;
 
     public List<string> selectedPowerups = new List<string>();
+
+    [Space]
+    [Header("Purchase Details")]
+    public GameObject purchaseMenu;
+
 
     void Start()
     {
@@ -100,5 +106,18 @@ public class PowerupHandler : MonoBehaviour {
             equipped.Add(thisEquipped.itemName);
         }
         return equipped;
+    }
+
+    public void BuyPowerup(string thisPowerup, PowerupMenuItem powerupButton)
+    {
+        foreach (Powerup_Item powerup in PowerupItems)
+        {
+            if (powerup.PowerupName == thisPowerup)
+            {
+                purchaseMenu.SetActive(true);
+                UI_PowerupPurchaseHandler purchaseHandler = purchaseMenu.GetComponent<UI_PowerupPurchaseHandler>();
+                purchaseHandler.setPowerup(powerup, powerupButton);
+            }
+        }
     }
 }
