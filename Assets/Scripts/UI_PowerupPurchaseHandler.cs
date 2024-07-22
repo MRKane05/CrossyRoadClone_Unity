@@ -24,6 +24,8 @@ public class UI_PowerupPurchaseHandler : MonoBehaviour {
         purchaseNumber = 1;
 
         setDisplayCost();
+
+        purchaseButton.interactable = (GameStateControllerScript.Instance.coins > thisPowerup.powerupCost);
     }
 
     public void setDisplayCost()
