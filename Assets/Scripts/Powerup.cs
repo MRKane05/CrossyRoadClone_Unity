@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static PlayerMovementScript;
 using DG.Tweening;
+using UnityEngine.UI;
 
 public class Powerup : MonoBehaviour
 {
@@ -13,7 +14,11 @@ public class Powerup : MonoBehaviour
     public enPowerupLife PowerupLife = enPowerupLife.NULL;
 
     public float lifeSpan = 7;
-    public float startTime = 0;
+    protected float startTime = 0;
+    public CanvasGroup Indicator_CanvasGroup;
+    public Image Indicator_FillImage;
+    public GameObject PowerupMarker;
+
 
     public Vector3 mountOffset = new Vector3(0, 1.6f, 0);
 
@@ -23,9 +28,14 @@ public class Powerup : MonoBehaviour
 
     public AudioClip Sound_OnPickup, Sound_OnActivate;
 
-    void Awake()
+    public void Awake()
     {
         ourAudio = gameObject.GetComponent<AudioSource>();
+
+        if (Indicator_CanvasGroup)
+        {
+            Indicator_CanvasGroup.alpha = 0;    //Make our indicator hidden
+        }
     }
 
     public virtual void OnEquip(GameObject playerObject)
@@ -58,7 +68,14 @@ public class Powerup : MonoBehaviour
 
     public virtual void RemovePowerup()
     {
-        transform.DOShakeScale(0.5f).SetUpdate(true).OnComplete(() => { Destroy(gameObject); });
+        if (PowerupMarker)
+        {
+            PowerupMarker.transform.DOShakeScale(0.5f).SetUpdate(true).OnComplete(() => { Destroy(gameObject); });
+        } else
+        {
+            transform.DOShakeScale(0.5f).SetUpdate(true).OnComplete(() => { Destroy(gameObject); });
+        }
+
     }
 
     void OnTriggerEnter(Collider other)
@@ -69,5 +86,4 @@ public class Powerup : MonoBehaviour
             OnEquip(other.gameObject);
         }
     }
-
 }

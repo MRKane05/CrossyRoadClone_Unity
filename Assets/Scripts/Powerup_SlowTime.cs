@@ -29,13 +29,21 @@ public class Powerup_SlowTime : Powerup {
 
     public void Update()
     {
-        /*
-        if (Time.time - pulseTime > 1 && bMounted)
+        //reveal our indicator
+        if (Indicator_CanvasGroup && bMounted)
         {
-            pulseTime = Time.time;
-            transform.DOShakeScale(0.5f).SetUpdate(true);
+            Indicator_CanvasGroup.alpha = Mathf.Lerp(Indicator_CanvasGroup.alpha, 1f, Time.unscaledDeltaTime * 5f);
+            Indicator_CanvasGroup.transform.eulerAngles = new Vector3(90, 0, 0);    //So that we won't face the player direction (nasty hack!)
         }
-        */
+        //empty our indicator
+        if (Indicator_FillImage && bMounted)
+        {
+            Indicator_FillImage.fillAmount = 1f - Mathf.Clamp01((Time.time - startTime) / lifeSpan);
+        }
+        if (PowerupMarker)
+        {
+            PowerupMarker.transform.localEulerAngles += Vector3.up * -120f * Time.unscaledDeltaTime;
+        }
 
         //Our on enable should have set our start time
         if (Time.time > startTime + lifeSpan && bMounted)
