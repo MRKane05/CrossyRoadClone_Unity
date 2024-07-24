@@ -43,6 +43,7 @@ ModelImporter:
     100074: LauncherA
     100076: LauncherB
     100078: SlowMotionEffect
+    100080: Cube_001
     400000: //RootNode
     400002: Chicken
     400004: Chicken_001
@@ -83,6 +84,7 @@ ModelImporter:
     400074: LauncherA
     400076: LauncherB
     400078: SlowMotionEffect
+    400080: Cube_001
     2100000: Black
     2100002: Orange
     2100004: White
@@ -179,6 +181,7 @@ ModelImporter:
     2300070: LauncherA
     2300072: LauncherB
     2300074: SlowMotionEffect
+    2300076: Cube_001
     3300000: //RootNode
     3300002: Chicken
     3300004: Chicken_001
@@ -217,6 +220,7 @@ ModelImporter:
     3300070: LauncherA
     3300072: LauncherB
     3300074: SlowMotionEffect
+    3300076: Cube_001
     4300000: Chicken
     4300002: Chicken_001
     4300004: Shadow
@@ -254,6 +258,7 @@ ModelImporter:
     4300068: LauncherA
     4300070: Catapult
     4300072: SlowMotionEffect
+    4300074: Cube_001
     7400000: Default Take
     9500000: //RootNode
   externalObjects: {}

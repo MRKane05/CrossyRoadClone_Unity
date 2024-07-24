@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using DG.Tweening;
 
 public class PlayerMovementScript : MonoBehaviour {
@@ -51,6 +52,9 @@ public class PlayerMovementScript : MonoBehaviour {
     bool bDoingToss = false;
 
     public bool bPlayerInvincible = false;
+    public bool bPlayerGhost = false;
+    public List<Material> playerMaterials = new List<Material>();
+    private Dictionary<Material, Material> materialMap = new Dictionary<Material, Material>();
 
     float AnimationFramerate = 30;
     public void SetCharacter(GameObject thisCharacter)
@@ -64,6 +68,60 @@ public class PlayerMovementScript : MonoBehaviour {
         GameObject newCharacter = Instantiate(thisCharacter, CharacterBase.transform);
         newCharacter.transform.localPosition = Vector3.zero;
         newCharacter.transform.localEulerAngles = Vector3.zero;
+
+        //Sort out our materials as we'll be changing them for ghost mode
+        materialMap.Clear();
+        materialMap = new Dictionary<Material, Material>();
+
+        playerMaterials.Clear();
+        playerMaterials = new List<Material>();
+
+        MeshRenderer[] playerRenderers = newCharacter.GetComponentsInChildren<MeshRenderer>();
+        //Debug.LogError("playerRenderers count: " + playerRenderers.Length);
+
+        foreach (MeshRenderer thisRenderer in playerRenderers)
+        {
+            Material[] originalMaterials = thisRenderer.sharedMaterials;
+            //Debug.LogError("originalMaterials count: " + originalMaterials.Length);
+            Material[] newMaterials = new Material[originalMaterials.Length];
+
+            for (int i = 0; i < originalMaterials.Length; i++)
+            {
+                Material originalMaterial = originalMaterials[i];
+
+                if (materialMap.ContainsKey(originalMaterial))
+                {
+                    //Debug.LogError("Material in dict");
+                    // If we've already created a new material instance, reuse it
+                    newMaterials[i] = materialMap[originalMaterial];
+                }
+                else
+                {
+                    // Create a new material instance and store it in the dictionary
+                    Material newMaterial = new Material(originalMaterial);
+                    materialMap[originalMaterial] = newMaterial;
+                    newMaterials[i] = newMaterial;
+                    //Debug.LogError("NewMaterial: " + newMaterial);
+                }
+            }
+
+            thisRenderer.materials = newMaterials;
+        }
+
+        foreach (Material instanceMat in materialMap.Values)
+        {
+            //instanceMat.SetFloat("_GhostCol", bState ? 0f : 1f);
+            playerMaterials.Add(instanceMat);
+        }
+    }
+
+    public void SetGhost(bool bState)
+    {
+        bPlayerGhost = bState;
+        foreach(Material instanceMat in playerMaterials)
+        {
+            instanceMat.SetFloat("_Alpha", bState ? 0f : 1f);
+        }
     }
 
     void Awake()
@@ -351,12 +409,8 @@ public class PlayerMovementScript : MonoBehaviour {
 
     public void GameOver(enDieType DieType) {
         if (bDoingToss) { return; } //Don't let our character die while we're being tossed
-        if (bPlayerInvincible) { return; }
-        /*
-        if (Time.time - powerupInvincibleStart < 0.5f)
-        {
-            return; //Don't kill our player as we've got a grace window
-        }*/
+        if ((bPlayerInvincible || bPlayerGhost) && (DieType == enDieType.TRAIN || DieType == enDieType.CAR)) { return; }
+
 
         //We need to see if we've got an enabled powerup and if it has any effect here
         if (EquippedPowerup)

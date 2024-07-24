@@ -75,7 +75,6 @@ public class Powerup : MonoBehaviour
         {
             transform.DOShakeScale(0.5f).SetUpdate(true).OnComplete(() => { Destroy(gameObject); });
         }
-
     }
 
     void OnTriggerEnter(Collider other)
