@@ -6,6 +6,7 @@ using DG.Tweening;
 
 public class Powerup_SlowTime : Powerup {
     float SlowTimeSpeed = 0.5f;
+    public bool bPlayedFinishSound = false;
 
     public override void OnEquip(GameObject playerObject)
     {
@@ -50,5 +51,17 @@ public class Powerup_SlowTime : Powerup {
         {
             RemovePowerup();
         }
+
+        if (Sound_OnActivate)
+        {
+            if (Time.time - 0.5f > startTime + Sound_OnActivate.length && !bPlayedFinishSound && bMounted)
+            {
+                bPlayedFinishSound = true;
+                ourAudio.clip = Sound_OnActivate;
+                ourAudio.Play();
+            }
+        }
+
+
     }
 }
