@@ -8,13 +8,20 @@ public class Powerup_Ghost : Powerup {
     float SlowTimeSpeed = 0.5f;
     public GameObject ourPlayer;
 
+    bool bPlayedFinishSound = false;
+
     public override void OnEquip(GameObject playerObject)
     {
         base.OnEquip(playerObject);
         ourPlayer = playerObject;
-        Time.timeScale = SlowTimeSpeed;
         LevelControllerScript.Instance.player.GetComponent<PlayerMovementScript>().setTimeScale(SlowTimeSpeed);
         ourPlayer.GetComponent<PlayerMovementScript>().SetGhost(true);
+        bMounted = true;
+
+        if (PowerupMarker)  //Hide our powerup marker
+        {
+            PowerupMarker.SetActive(false);
+        }
     }
 
     public virtual bool GameOver(GameObject PlayerCharacter, enDieType DieType)
@@ -47,6 +54,17 @@ public class Powerup_Ghost : Powerup {
         if (PowerupMarker)
         {
             PowerupMarker.transform.localEulerAngles += Vector3.up * -120f * Time.unscaledDeltaTime;
+            PowerupMarker.transform.localPosition = Vector3.up * Mathf.Abs(Mathf.Sin(Time.unscaledTime * 2f) * 0.5f);
+        }
+
+        if (Sound_OnActivate)
+        {
+            if (Time.time > startTime + lifeSpan - Sound_OnActivate.length && !bPlayedFinishSound && bMounted)
+            {
+                bPlayedFinishSound = true;
+                ourAudio.clip = Sound_OnActivate;
+                ourAudio.Play();
+            }
         }
 
         //Our on enable should have set our start time

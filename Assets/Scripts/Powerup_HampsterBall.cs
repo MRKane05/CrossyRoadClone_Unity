@@ -6,6 +6,9 @@ using DG.Tweening;
 
 public class Powerup_HampsterBall : Powerup {
     float pulseTime = 0;
+    bool bPlayedFinishSound = false;
+
+    public AudioClip powerupFinishClip;
 
     public virtual void OnEquip()
     {
@@ -61,6 +64,16 @@ public class Powerup_HampsterBall : Powerup {
         if (PowerupMarker)
         {
             PowerupMarker.transform.localEulerAngles += Vector3.up * -120f * Time.unscaledDeltaTime;
+        }
+
+        if (powerupFinishClip)
+        {
+            if (Time.time > startTime + lifeSpan - powerupFinishClip.length && !bPlayedFinishSound && bMounted)
+            {
+                bPlayedFinishSound = true;
+                ourAudio.clip = powerupFinishClip;
+                ourAudio.Play();
+            }
         }
 
         //Our on enable should have set our start time
