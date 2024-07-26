@@ -31,5 +31,5 @@
         ENDCG
 
     }
-    Fallback "Legacy Shaders/Mobile/Diffuse"
+    Fallback "Legacy Shaders/Diffuse"
 }

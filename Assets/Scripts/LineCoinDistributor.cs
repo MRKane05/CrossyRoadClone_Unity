@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LineCoinDistributor : MonoBehaviour {
 	public GameObject coinPrefab;
-	float coinOdds = 1; //0.15f; //For the moment :)
+	float coinOdds = 0.15f; //Feels about correct :)
 	public LayerMask stopperLayerMask;
 	IEnumerator Start()
     {

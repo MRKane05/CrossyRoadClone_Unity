@@ -1,0 +1,193 @@
+fileFormatVersion: 2
+guid: f9e6ab03a8d28534ab471539b7338c2d
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: //RootNode
+    100002: Cube
+    100004: RoadLine
+    100006: ShadowLeft
+    100008: ShadowRight
+    100010: Truck
+    100012: Truck.001
+    100014: Ute
+    100016: veh_car1
+    100018: Truck.002
+    400000: //RootNode
+    400002: Cube
+    400004: RoadLine
+    400006: ShadowLeft
+    400008: ShadowRight
+    400010: Truck
+    400012: Truck.001
+    400014: Ute
+    400016: veh_car1
+    400018: Truck.002
+    2100000: SedanDynamic
+    2100002: blinn14
+    2100004: blinn15
+    2100006: lambert3
+    2100008: blinn17
+    2100010: RoadShadow
+    2100012: lambert0
+    2100014: Dirt
+    2100016: LightRoad
+    2100018: DarkRoad
+    2300000: Cube
+    2300002: RoadLine
+    2300004: ShadowLeft
+    2300006: ShadowRight
+    2300008: Truck
+    2300010: Ute
+    2300012: veh_car1
+    2300014: //RootNode
+    2300016: Truck.002
+    3300000: Cube
+    3300002: RoadLine
+    3300004: ShadowLeft
+    3300006: ShadowRight
+    3300008: Truck
+    3300010: Ute
+    3300012: veh_car1
+    3300014: //RootNode
+    3300016: Truck.002
+    4300000: Truck
+    4300002: Ute
+    4300004: ShadowRight
+    4300006: ShadowLeft
+    4300008: Cube
+    4300010: veh_car1
+    4300012: RoadLine
+    4300014: Truck.002
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: DarkRoad
+    second: {fileID: 2100000, guid: cd3e166b91940b94789f3127ac5f032b, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Dirt
+    second: {fileID: 2100000, guid: ab1baf3176e10e048b380ed6d96c4a68, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: LightRoad
+    second: {fileID: 2100000, guid: 54db6302fa0bcfc46bb0d0ccbceecbd2, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: RoadShadow
+    second: {fileID: 2100000, guid: 4b6c0dbbe3276fe4095719c2e2687f7e, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: SedanDynamic
+    second: {fileID: 2100000, guid: 367fb60e6429dca4aa0976b21ab3260c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: blinn14
+    second: {fileID: 2100000, guid: 26b10ecec001b0543962b4ec8359ac58, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: blinn15
+    second: {fileID: 2100000, guid: 2c031cbc6901f7b47bf6c3c1b20c6661, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: blinn17
+    second: {fileID: 2100000, guid: 779b70b7c6c948b439dedcb3f969d8d5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert0
+    second: {fileID: 2100000, guid: 84ece2bdf9939414abffa2aee508e6f5, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lambert3
+    second: {fileID: 2100000, guid: bc23f628c26069c44ab666d874fb5e55, type: 2}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

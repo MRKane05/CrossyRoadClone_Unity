@@ -45,6 +45,7 @@ ModelImporter:
     100078: SlowMotionEffect
     100080: Cube_001
     100082: Plane
+    100084: pCube1
     400000: //RootNode
     400002: Chicken
     400004: Chicken_001
@@ -87,6 +88,7 @@ ModelImporter:
     400078: SlowMotionEffect
     400080: Cube_001
     400082: Plane
+    400084: pCube1
     2100000: Black
     2100002: Orange
     2100004: White
@@ -146,6 +148,21 @@ ModelImporter:
     2100112: Rock
     2100114: unnamed
     2100116: Grey
+    2100118: lambert2_002
+    2100120: lambert8_003
+    2100122: lambert6
+    2100124: lambert5
+    2100126: lambert12
+    2100128: lambert13
+    2100130: lambert3_003
+    2100132: lambert7
+    2100134: lambert10_003
+    2100136: lambert17
+    2100138: lambert11_002
+    2100140: lambert9_003
+    2100142: lambert15
+    2100144: lambert16
+    2100146: lambert4
     2300000: //RootNode
     2300002: Chicken
     2300004: Chicken_001
@@ -186,6 +203,7 @@ ModelImporter:
     2300074: SlowMotionEffect
     2300076: Cube_001
     2300078: Plane
+    2300080: pCube1
     3300000: //RootNode
     3300002: Chicken
     3300004: Chicken_001
@@ -226,6 +244,7 @@ ModelImporter:
     3300074: SlowMotionEffect
     3300076: Cube_001
     3300078: Plane
+    3300080: pCube1
     4300000: Chicken
     4300002: Chicken_001
     4300004: Shadow
@@ -265,6 +284,7 @@ ModelImporter:
     4300072: SlowMotionEffect
     4300074: Cube_001
     4300076: Plane
+    4300078: pCube1
     7400000: Default Take
     9500000: //RootNode
   externalObjects: {}

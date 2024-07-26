@@ -10,7 +10,7 @@ public class PowerupHandler : MonoBehaviour {
 
     public GameObject powerupDisplayArea, selectedPowerupsBase;
 
-    public GameObject powerupItem, equippedPowerupItem;
+    public GameObject powerupItem, equippedPowerupItem, EquippedItemMaxMessage;
 
     public List<string> selectedPowerups = new List<string>();
 
@@ -75,6 +75,13 @@ public class PowerupHandler : MonoBehaviour {
 
     public bool AddPowerupToStack(string thisPowerup, PowerupMenuItem caller)
     {
+        int countAlready = selectedPowerupsBase.transform.childCount;
+        if (countAlready >= 5)
+        {
+            EquippedItemMaxMessage.SetActive(true);
+            return false;
+        }
+
         GameObject newEquippedButton = Instantiate(equippedPowerupItem, selectedPowerupsBase.transform);
         PowerupEquippedItem thisScript = newEquippedButton.GetComponent<PowerupEquippedItem>();
         thisScript.setItem(thisPowerup);
@@ -93,6 +100,8 @@ public class PowerupHandler : MonoBehaviour {
             if (powerupItem.itemName == thisPowerup)
             {
                 powerupItem.returnPowerup();
+                //And logically
+                EquippedItemMaxMessage.SetActive(false); //Clear our "too many items" message if we've dropped this
             }
         }
     }

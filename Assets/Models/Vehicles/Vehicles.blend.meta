@@ -12,6 +12,9 @@ ModelImporter:
     100012: ShadowLeft
     100014: ShadowRight
     100016: Ute
+    100018: Truck
+    100020: Truck_001
+    100022: Truck_002
     400000: Cube
     400002: Cube_001
     400004: RoadLine
@@ -21,6 +24,9 @@ ModelImporter:
     400012: ShadowLeft
     400014: ShadowRight
     400016: Ute
+    400018: Truck
+    400020: Truck_001
+    400022: Truck_002
     2100000: unnamed
     2100002: lambert0
     2100004: Dirt
@@ -28,6 +34,10 @@ ModelImporter:
     2100008: DarkRoad
     2100010: SedanDynamic__SedanCar_Texture_png
     2100012: RoadShadow
+    2100014: blinn14
+    2100016: blinn15
+    2100018: lambert3
+    2100020: blinn17
     2300000: Cube
     2300002: Cube_001
     2300004: RoadLine
@@ -36,6 +46,8 @@ ModelImporter:
     2300010: ShadowLeft
     2300012: ShadowRight
     2300014: Ute
+    2300016: Truck
+    2300018: Truck_002
     3300000: Cube
     3300002: Cube_001
     3300004: RoadLine
@@ -44,6 +56,8 @@ ModelImporter:
     3300010: ShadowLeft
     3300012: ShadowRight
     3300014: Ute
+    3300016: Truck
+    3300018: Truck_002
     4300000: Cube_001
     4300002: Cube
     4300004: veh_car1
@@ -52,6 +66,8 @@ ModelImporter:
     4300010: ShadowRight
     4300012: ShadowLeft
     4300014: Ute
+    4300016: Truck
+    4300018: Truck_002
     7400000: Default Take
     9500000: //RootNode
   externalObjects: {}

@@ -54,8 +54,9 @@ public class CarScript : MonoBehaviour {
         if (RightShadow) { RightShadow.SetActive(speedX > 0); }
         if (LeftShadow) { LeftShadow.SetActive(speedX < 0); }
         */
-        RightShadow.SetActive(false);
-        LeftShadow.SetActive(false);
+
+        if (RightShadow) { RightShadow.SetActive(false); }
+        if (LeftShadow) { LeftShadow.SetActive(false); }
     }
 
     public void SetMaterialColor(Color newColor)

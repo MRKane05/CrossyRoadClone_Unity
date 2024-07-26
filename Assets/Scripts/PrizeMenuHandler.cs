@@ -29,6 +29,7 @@ public class PrizeMenuHandler : MonoBehaviour {
     float PowerupOdds = 0.6f; //If we're above this we'll get a powerup. If we're neither we'll get money
 
     bool bPrizeRunning = false;
+    bool bCanRotate = false;
     public void Start()
     {
         ourAudio = gameObject.GetComponent<AudioSource>();
@@ -64,7 +65,10 @@ public class PrizeMenuHandler : MonoBehaviour {
 
     void Update()
     {
-        displayAnchor.transform.localEulerAngles += Vector3.up * Time.deltaTime * 30f;
+        if (bCanRotate)
+        {
+            displayAnchor.transform.localEulerAngles += Vector3.up * Time.deltaTime * 30f;
+        }
     }
 
     public void PlayPrizeMachine()
@@ -94,9 +98,9 @@ public class PrizeMenuHandler : MonoBehaviour {
                 CharacterList.Add(thisCharacter);
             }
         }
-
+        bCanRotate = false;
         //Select a character as a prize
-        
+
         //newPrize = new SelectableCharacter();
         //newPrize.CharacterName = "Chicken";
         //newPrize.Unlocked = true;
@@ -120,7 +124,7 @@ public class PrizeMenuHandler : MonoBehaviour {
         float prizeDraw = Random.value;
 
         //First up our character :)
-        if (prizeDraw < CharacterOdds)
+        if (prizeDraw < CharacterOdds && false)
         {
             ourAudio.clip = sound_Character;
             ourAudio.Play();
@@ -134,7 +138,7 @@ public class PrizeMenuHandler : MonoBehaviour {
             characterPrefab.transform.localPosition = Vector3.zero;
             characterPrefab.transform.localScale = Vector3.one;
             displayAnchor.transform.localEulerAngles = new Vector3(0, 125, 0);  //Set our angle
-            displayAnchor.transform.DOShakeScale(0.5f);
+            displayAnchor.transform.DOShakeScale(0.5f).SetUpdate(true).OnComplete(() => { bCanRotate = true; }) ;
 
             if (!newPrize.Unlocked)
             {
@@ -162,12 +166,27 @@ public class PrizeMenuHandler : MonoBehaviour {
                 alreadyOwnedLabel.transform.DOPunchScale(Vector3.one * 1.5f, 0.75f).OnComplete(() => { alreadyOwnedLabel.transform.localScale = Vector3.one; }); ;
                 GameStateControllerScript.Instance.ChangeCoinTotal(75); //Give our player 75 coins
             }
-        } else if (prizeDraw > PowerupOdds) //get a powerup
+        } else if (prizeDraw > PowerupOdds || true) //get a powerup
         {
+            //Ok, we need to pick a powerup from our list, and award it to the player
+            int selectedPowerup = Mathf.Clamp(Random.RandomRange(0, PowerupHandler.Instance.PowerupItems.Count), 0, PowerupHandler.Instance.PowerupItems.Count-1);
+            Powerup_Item WonPowerup = PowerupHandler.Instance.PowerupItems[selectedPowerup];
+
+            displayAnchor.SetActive(true);
+            GameObject characterPrefab = Instantiate(WonPowerup.powerupPrefab, displayAnchor.transform);
+            characterPrefab.transform.localPosition = Vector3.zero;
+            characterPrefab.transform.localScale = Vector3.one;
+            displayAnchor.transform.localEulerAngles = new Vector3(0, 125, 0);  //Set our angle
+            displayAnchor.transform.DOShakeScale(0.5f, 100).SetUpdate(true).OnComplete(() => { bCanRotate = true; });
+
             displayIcon.GetComponent<Image>().sprite = PowerupIcon;
-            Debug.Log("Got a powerup");
-            WinningTitle.text = "POWERUP";
-            GameStateControllerScript.Instance.ChangeCoinTotal(100); //Give cash back for testing purposes
+
+            WinningTitle.text = WonPowerup.PowerupName;// "POWERUP";
+            ourAudio.clip = sound_Powerup;
+            ourAudio.Play();
+
+            //And finally we've got to add our powerup!
+            GameStateControllerScript.Instance.ChangePowerupCount(WonPowerup.PowerupName, 1);
 
         } else //You get cash!
         {

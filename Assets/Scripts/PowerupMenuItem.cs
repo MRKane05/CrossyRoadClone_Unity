@@ -63,6 +63,9 @@ public class PowerupMenuItem : MonoBehaviour {
             itemCount -= 1;
             //Update our title
             setButtonText(itemName, itemCount);
+        } else
+        {
+            //We need to display a message saying "limit reached"
         }
     }
 

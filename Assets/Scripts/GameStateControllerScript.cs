@@ -88,6 +88,7 @@ public class GameStateControllerScript : MonoBehaviour {
 
     public void UISetScreenOrientation(string orientation)
     {
+        PlayerPrefs.SetString("ScreenOrientation", orientation);
         switch (orientation)
         {
             case "landscape":
@@ -149,6 +150,13 @@ public class GameStateControllerScript : MonoBehaviour {
         bBeatTopScore = false;
         passedIntiger = 1;
         optionsMenu.SetActive(true); //Turn this on so that our prefs can take effect
+
+        //handle our screent orientation
+        string ScreenSet = PlayerPrefs.GetString("ScreenOrientation");
+        if (ScreenSet.Length > 2)
+        {
+            UISetScreenOrientation(ScreenSet);
+        }
     }
 
     public void Update() {
@@ -380,11 +388,26 @@ public class GameStateControllerScript : MonoBehaviour {
 
     public void ChangePowerupCount(string itemName, int countChange)
     {
+        bool bHasAdded = false;
         foreach(Powerup_Item thisPowerup in PowerupItems)
         {
             if (thisPowerup.PowerupName == itemName)
             {
+                bHasAdded = true;
                 thisPowerup.count += countChange;
+            }
+        }
+        //Ok, so we didn't get to add that powerup. Annoying. Lets see if our powerup handler has it and we'll add it to our list
+        if (!bHasAdded)
+        {
+            foreach (Powerup_Item newPowerup in PowerupHandler.Instance.PowerupItems)
+            {
+                if (newPowerup.PowerupName == itemName)
+                {
+                    PowerupItems.Add(newPowerup);
+                    //Logically it'll be at the end
+                    PowerupItems[PowerupItems.Count - 1].count += countChange;
+                }
             }
         }
     }
