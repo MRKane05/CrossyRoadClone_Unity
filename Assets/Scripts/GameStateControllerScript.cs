@@ -198,9 +198,9 @@ public class GameStateControllerScript : MonoBehaviour {
                 if (score > passedIntiger * 25)
                 {
                     int coinReward = 3 * passedIntiger;
-                    passedIntiger++;
                     playNotification.DisplayRect("passed " + passedIntiger * 25 + "\n get " + coinReward);
                     ChangeCoinTotal(coinReward);
+                    passedIntiger++;
                 }
 
                 //We could do with some other benchmark things, like "passed 25 lines"

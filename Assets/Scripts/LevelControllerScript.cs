@@ -10,8 +10,8 @@ public class LevelControllerScript : MonoBehaviour {
     public static LevelControllerScript Instance { get; private set; }
 
     public int minZ = 3;
-    public int lineAhead = 40;
-    public int lineBehind = 20;
+    public int lineAhead = 10;
+    public int lineBehind = 10;
 
     public GameObject[] linePrefabs;
     public GameObject coins;
@@ -159,6 +159,10 @@ public class LevelControllerScript : MonoBehaviour {
         SpawnedLines.Clear();
         SpawnedLines = new List<LineHandler>();
 
+        //We should clear our dictionary also (shame this can't be sent through as some sort of self-destruct message)
+        lines.Clear();
+        lines = new Dictionary<int, GameObject>();
+
         //we need to put our character back in it's spot
         player.transform.position = Vector3.up * 1f;     //Set to zero and up 1 unit
         player.transform.localScale = Vector3.one;      //Reset scale just in case we've had something different change
@@ -177,7 +181,7 @@ public class LevelControllerScript : MonoBehaviour {
         mapLine = 0;
         for (int i=1; i<lineAhead+1; i++)
         {
-            AddNewMapLine(i * 3);
+            AddNewMapLine(i, i * 3);
             mapLine = i;
         }
     }
@@ -190,7 +194,7 @@ public class LevelControllerScript : MonoBehaviour {
 
         while (mapLine < playerHighestRow + lineAhead) { 
 
-            AddNewMapLine((mapLine) * 3);
+            AddNewMapLine(mapLine, (mapLine) * 3);
             mapLine++;
 
             //Seee if we can drop a powerup on this line
@@ -221,39 +225,44 @@ public class LevelControllerScript : MonoBehaviour {
 
     }
 
-    public void AddNewMapLine(float newPosition)
+    public void AddNewMapLine(int z, float newPosition)
     {
-        Vector3 targetPosition = new Vector3(0, 0, newPosition);
-        GameObject selectedPrefab = linePrefabs[Random.Range(0, linePrefabs.Length)];
-        GameObject newline = Instantiate(selectedPrefab, targetPosition, Quaternion.identity) as GameObject;
-        //Debug.Log("newLine: " + newline);
-
-        newline.transform.position = targetPosition;
-        newline.transform.localScale = Vector3.one;
-
-        //Lets do a bit of vetting and see if we need to put a joiner in place
-        LineHandler newHandler = newline.GetComponent<LineHandler>();
-
-        if (SpawnedLines.Count > 1)
+        if (!lines.ContainsKey(z))
         {
-            //Get our prior line
-            LineHandler.enLineType priorLineType = SpawnedLines[SpawnedLines.Count - 1].LineType;
-            
-            switch (newHandler.LineType)
+            Vector3 targetPosition = new Vector3(0, 0, newPosition);
+            GameObject selectedPrefab = linePrefabs[Random.Range(0, linePrefabs.Length)];
+            GameObject newline = Instantiate(selectedPrefab, targetPosition, Quaternion.identity) as GameObject;
+            //Debug.Log("newLine: " + newline);
+
+            newline.transform.position = targetPosition;
+            newline.transform.localScale = Vector3.one;
+
+            //Lets do a bit of vetting and see if we need to put a joiner in place
+            LineHandler newHandler = newline.GetComponent<LineHandler>();
+
+            if (SpawnedLines.Count > 1)
             {
-                case LineHandler.enLineType.ROAD:
-                    newHandler.SetJoiningDetail(priorLineType == LineHandler.enLineType.ROAD);
-                    break;
-                default:
-                    break;
+                //Get our prior line
+                LineHandler.enLineType priorLineType = SpawnedLines[SpawnedLines.Count - 1].LineType;
 
+                switch (newHandler.LineType)
+                {
+                    case LineHandler.enLineType.ROAD:
+                        newHandler.SetJoiningDetail(priorLineType == LineHandler.enLineType.ROAD);
+                        break;
+                    default:
+                        break;
+
+                }
             }
-        } else
-        {
-            newHandler.SetJoiningDetail(false); //So that our road edge isn't displayed if it's the frist on the map
-        }
+            else
+            {
+                newHandler.SetJoiningDetail(false); //So that our road edge isn't displayed if it's the frist on the map
+            }
 
-        SpawnedLines.Add(newHandler);
+            SpawnedLines.Add(newHandler);
+            lines.Add(z, newline);
+        }
     }
 	
     public void Redundant_Update() {

@@ -10,7 +10,9 @@ public class MoneyBehaviour : MonoBehaviour {
         {
             //We need to collect this, play some effect/sound and then add the score to our total. Lets start simple.
             GameStateControllerScript.Instance.ChangeCoinTotal(1);
-            Destroy(gameObject);    //Remove ourself
+            GetComponent<AudioSource>().Play();
+            GetComponent<MeshRenderer>().enabled = false; //Turn off our mesh renderer
+            Destroy(gameObject, 3f);    //Remove ourself after our audio has played
         }
     }
 }
