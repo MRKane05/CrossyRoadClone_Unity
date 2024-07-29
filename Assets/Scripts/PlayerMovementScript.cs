@@ -10,6 +10,7 @@ public class PlayerMovementScript : MonoBehaviour {
 
     public bool canMove = false;
     public LayerMask stopperLayerMask;
+    public LayerMask groundcastMask;
     float stepTime = 0.3f;
 
     public Animation HopAnimator;
@@ -360,10 +361,38 @@ public class PlayerMovementScript : MonoBehaviour {
         }
     }
 
+    bool bPlayerGrounded()
+    {
+        //So lets do a raycast along a strip and see if we're on the ground
+        float span = 0.6f;
+        float raycount = 5f;
+        for (int i = 0; i < raycount; i++)
+        {
+            float t = (float)i / raycount;
+            float shift = Mathf.Lerp(-span, span, t);
+            RaycastHit hit;
+            // Does the ray intersect any objects excluding the player layer
+            if (Physics.Raycast(transform.position + Vector3.right * shift, -Vector3.up, out hit, 30, groundcastMask))
+            {
+                //Debug.DrawRay(transform.position, -Vector3.up * hit.distance, Color.yellow);
+                //Debug.Log(hit.collider.gameObject.name);
+                if (!hit.collider.gameObject.name.Contains("Water")) //We've landed in the water. Prevent our double hop
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     void ValidateMoveAndMap()
     {
-        moving = false;
+        moving = !bPlayerGrounded();    //If we're not grounded then lock our player movement so we drown
         body.isKinematic = false;
+        //A basic raycast approach isn't the way to do this as it's possible to miss and for us to be on a log...
+        //We need to check and see if we're over water, and if so have our character "die"
+        //So lets see if we can raycast against whatever tile we're above now
+        
         //Send a call through to our LevelController saying that we've moved and see if we've got to add a new line
         if (LevelControllerScript.Instance)
         {
@@ -460,7 +489,7 @@ public class PlayerMovementScript : MonoBehaviour {
         transform.position = new Vector3(0, 1, 0);
         transform.localScale = new Vector3(1, 1, 1);
         transform.rotation = Quaternion.identity;
-
+        moving = false;
         score = 0;
     }
 }

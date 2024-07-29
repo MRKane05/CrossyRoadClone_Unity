@@ -138,11 +138,7 @@ public class GameStateControllerScript : MonoBehaviour {
         SetScreenOrientation(ScreenOrientation);
 
         //Load our prefs details
-        /*
-        coins = PlayerPrefs.GetInt("Coins");
-        score_top = PlayerPrefs.GetInt("TopScore"); //Retrieve our top score
-        */
-        topScore.text = score_top.ToString();
+        SetTopScore(score_top);
         SetCoinsDisplay(coins);
         playScore.text = "0";   //Set our scores
 
@@ -157,6 +153,12 @@ public class GameStateControllerScript : MonoBehaviour {
         {
             UISetScreenOrientation(ScreenSet);
         }
+    }
+
+    public void SetTopScore(int toThis)
+    {
+        score_top = toThis;
+        topScore.text = toThis.ToString();
     }
 
     public void Update() {
@@ -181,9 +183,7 @@ public class GameStateControllerScript : MonoBehaviour {
                         playNotification.DisplayRect("Top score\nget 25c");
                         ChangeCoinTotal(25);
                     }
-                    score_top = score;
-                    //PlayerPrefs.SetInt("TopScore", score_top);
-                    topScore.text = score_top.ToString();
+                    SetTopScore(score);
                     topScore.transform.DOPunchScale(Vector3.one * 0.2f, 0.5f).OnComplete(() => { topScore.transform.localScale = Vector3.one; }); ;  //This is big! We set our top score!
                 }
                 if (score > score_top / 2f && score_top > 0)
@@ -259,10 +259,7 @@ public class GameStateControllerScript : MonoBehaviour {
 
         gameOverScore.text = score.ToString();
         if (score > score_top) {
-            score_top = score;
-            //PlayerPrefs.SetInt("TopScore", score_top);
-            topScore.text = score_top.ToString();
-            //topScore.transform.DOPunchScale(Vector3.one * 1.1f, 0.5f);  //This is big! We set our top score!
+            SetTopScore(score);
         }
         LevelControllerScript.Instance.camera.GetComponent<CameraMovementScript>().moving = false;
         //GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CameraMovementScript>().moving = false;
