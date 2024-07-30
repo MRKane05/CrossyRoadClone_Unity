@@ -436,7 +436,7 @@ public class PlayerMovementScript : MonoBehaviour {
 
     float powerupInvincibleStart = 0;
 
-    public void GameOver(enDieType DieType) {
+    public void GameOver(enDieType DieType, bool bSquashFlat = true) {
         if (bDoingToss) { return; } //Don't let our character die while we're being tossed
         if ((bPlayerInvincible || bPlayerGhost) && (DieType == enDieType.TRAIN || DieType == enDieType.CAR)) { return; }
 
@@ -467,7 +467,8 @@ public class PlayerMovementScript : MonoBehaviour {
         if (DieType == enDieType.CAR)
         {
             //We should vary this for the case where we jump into the vehicle
-            //killMoveTween();
+            killMoveTween();
+
             Vector3 scale = transform.localScale;
             transform.localScale = new Vector3(scale.x, scale.y * 0.1f, scale.z);
             PlaySound(SFX_Hit);

@@ -89,6 +89,7 @@ public class GameStateControllerScript : MonoBehaviour {
     public void UISetScreenOrientation(string orientation)
     {
         PlayerPrefs.SetString("ScreenOrientation", orientation);
+        PlayerPrefs.Save();
         switch (orientation)
         {
             case "landscape":
@@ -135,7 +136,7 @@ public class GameStateControllerScript : MonoBehaviour {
     public void Start() {
         currentCanvas = null;
         MainMenu();
-        SetScreenOrientation(ScreenOrientation);
+        //SetScreenOrientation(ScreenOrientation);
 
         //Load our prefs details
         SetTopScore(score_top);

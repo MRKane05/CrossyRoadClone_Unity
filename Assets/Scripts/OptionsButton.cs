@@ -28,6 +28,7 @@ public class OptionsButton : MonoBehaviour {
 	public void ToggleState(bool bNewState)
     {
 		PlayerPrefs.SetInt(targetPrefs, bNewState? 1 : 0);
+		PlayerPrefs.Save();
 		bState = bNewState;
 		targetToggle.enabled = bState; //.SetActive(bState);
 	}	
