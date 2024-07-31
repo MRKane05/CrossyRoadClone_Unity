@@ -56,11 +56,7 @@ public class PrizeMenuHandler : MonoBehaviour {
         UnlockedCharcter = "";
         //PlayButton.interactable = false;
         DoSpinButton.interactable = GameStateControllerScript.Instance.coins > 100;
-        InsufficentCoinsNotice.SetActive(GameStateControllerScript.Instance.coins < 100);
-        if (GameStateControllerScript.Instance.coins < 100)
-        {
-            InsufficentCoinsText.text = "Not enough coins\nyou need " + (100 - GameStateControllerScript.Instance.coins) + " more";
-        }
+        CheckInsufficentDisplay();
     }
 
     void Update()
@@ -72,11 +68,12 @@ public class PrizeMenuHandler : MonoBehaviour {
     }
 
     public void PlayPrizeMachine()
-    { 
+    {
+        OpenMenu();
         if (!bPrizeRunning)
         {
             GameStateControllerScript.Instance.ChangeCoinTotal(-100);
-            OpenMenu(); //reset everything to our default state
+            //OpenMenu(); //reset everything to our default state
             StartCoroutine(DoPrizeMachine());
         }
     }
@@ -117,7 +114,7 @@ public class PrizeMenuHandler : MonoBehaviour {
         //We need some way of selecting what prize we'll be giving out.
 
         displayArea.SetActive(true);
-        displayArea.transform.DOPunchScale(Vector3.one * 0.2f, 0.5f).OnComplete(() => { displayArea.transform.localScale = Vector3.one; }); ;
+        displayArea.transform.DOPunchScale(Vector3.one * 0.2f, 0.5f).OnComplete(() => { displayArea.transform.localScale = Vector3.one;}); ;
         displayIcon.SetActive(true);
         
         //We need to see about setting things up for character/money/powerup
@@ -163,8 +160,9 @@ public class PrizeMenuHandler : MonoBehaviour {
                 ourAudio.clip = sound_Cash;
                 ourAudio.Play();
                 alreadyOwnedLabel.SetActive(true);
-                alreadyOwnedLabel.transform.DOPunchScale(Vector3.one * 1.5f, 0.75f).OnComplete(() => { alreadyOwnedLabel.transform.localScale = Vector3.one; }); ;
+                alreadyOwnedLabel.transform.DOPunchScale(Vector3.one * 1.5f, 0.75f).OnComplete(() => { alreadyOwnedLabel.transform.localScale = Vector3.one;});
                 GameStateControllerScript.Instance.ChangeCoinTotal(75); //Give our player 75 coins
+                
             }
         } else if (prizeDraw > PowerupOdds) //get a powerup
         {
@@ -200,8 +198,12 @@ public class PrizeMenuHandler : MonoBehaviour {
             ourAudio.Play();
             //alreadyOwnedLabel.SetActive(true);
             //alreadyOwnedLabel.transform.DOPunchScale(Vector3.one * 1.5f, 0.75f);
-            GameStateControllerScript.Instance.ChangeCoinTotal(75); //Give our player 75 coins
+            //GameStateControllerScript.Instance.ChangeCoinTotal(75); //Give our player 75 coins
+
+
         }
+
+        //CheckInsufficentDisplay();
 
         DoSpinButton.interactable = GameStateControllerScript.Instance.coins > 100;
         PlayButton.interactable = true;
@@ -209,6 +211,16 @@ public class PrizeMenuHandler : MonoBehaviour {
         //We'd be wise to save at this point also
         SaveScoreUtility.Instance.SaveGameInformation();
         bPrizeRunning = false; //Free up our system for re-use
+    }
+
+    void CheckInsufficentDisplay()
+    {
+        DoSpinButton.interactable = GameStateControllerScript.Instance.coins > 100;
+        InsufficentCoinsNotice.SetActive(GameStateControllerScript.Instance.coins < 100);
+        if (GameStateControllerScript.Instance.coins < 100)
+        {
+            InsufficentCoinsText.text = "Not enough coins\nyou need " + (100 - GameStateControllerScript.Instance.coins) + " more";
+        }
     }
 
     public void PlayWithNewCharacter()
