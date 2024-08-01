@@ -54,6 +54,7 @@ public class TrunkFloatingScript : MonoBehaviour {
     public void OnCollisionEnter(Collision collision) {
         if (collision.gameObject.tag == "Player") {
             playerBody = collision.gameObject.GetComponent<Rigidbody>();
+            collision.gameObject.GetComponent<PlayerMovementScript>().onLog = true;
 
             if (!sinking) {
                 var o = (GameObject)Instantiate(splashPrefab, transform.position, Quaternion.Euler(-90, 0, 0));
@@ -61,13 +62,26 @@ public class TrunkFloatingScript : MonoBehaviour {
 
                 sinking = true;
                 elapsedTime = 0.0f;
+                
             }
+
+            //We need to notify to our player that we're standign on a log
         }
     }
 
     public void OnCollisionStay(Collision collision) {
         if (collision.gameObject.tag == "Player") {
+            collision.gameObject.GetComponent<PlayerMovementScript>().onLog = true;
             playerBody.position += new Vector3(speedX * Time.deltaTime, 0.0f, 0.0f);
+        }
+        //Can notify that player is on log here too...
+    }
+
+    public void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.tag == "Player")
+        {
+            collision.gameObject.GetComponent<PlayerMovementScript>().onLog = false;
         }
     }
 

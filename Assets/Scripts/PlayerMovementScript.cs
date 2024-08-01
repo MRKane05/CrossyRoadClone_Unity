@@ -7,11 +7,16 @@ public class PlayerMovementScript : MonoBehaviour {
     public enum enDieType { NULL, CAR, TRAIN, WATER, EAGLE}
 
     public GameStateControllerScript gameStateController;
+    public UI_MoveSpeedDisplay debugPanel;
 
     public bool canMove = false;
+    public bool onLog = false;
+    Vector3 wantsMove = Vector3.zero;
+
     public LayerMask stopperLayerMask;
     public LayerMask groundcastMask;
     float stepTime = 0.3f;
+    public float stepModifier = 1f;
 
     public Animation HopAnimator;
     public AnimationClip HopStandard, HopFast;
@@ -204,10 +209,16 @@ public class PlayerMovementScript : MonoBehaviour {
         {
             // Update current to match integer position (not fractional).
             current = new Vector3(Mathf.Round(transform.position.x), Mathf.Round(transform.position.y), Mathf.Round(transform.position.z));
-
-            if (canMove)
-                HandleInput();
+            //Handle actioning our wants move if we have one
+            if (wantsMove != Vector3.zero)
+            {
+                DoMove(wantsMove);
+                wantsMove = Vector3.zero;
+            }
         }
+
+        //Input has now been seperated from states to make things more fluid
+        HandleInput();
 
         score = Mathf.Max(score, (int)current.z/3);
         //gameStateController.score = score / 3;
@@ -235,8 +246,8 @@ public class PlayerMovementScript : MonoBehaviour {
             gameStateController.TriggerEagle(transform.position);
         }
     }
-	
-	private void HandleMouseClick() {
+
+    private void HandleMouseClick() {
 		RaycastHit hit;
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		
@@ -270,7 +281,20 @@ public class PlayerMovementScript : MonoBehaviour {
 			//HandleMouseClick();   //Disable our touch input for now
 			return;
 		}
-		
+
+        //So we need something to handle our player speed tweaks for our hardcore users to give me some real numbers to work with
+        if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetButtonDown("Left Shoulder"))
+        {
+            stepModifier = Mathf.Clamp(stepModifier - 0.1f, 0.2f, 1.5f);
+            debugPanel.setDisplayText("MoveScale: " + stepModifier.ToString());
+        }
+
+        if (Input.GetKeyDown(KeyCode.RightShift) || Input.GetButtonDown("Right Shoulder"))
+        {
+            stepModifier = Mathf.Clamp(stepModifier + 0.1f, 0.2f, 1.5f);
+            debugPanel.setDisplayText("MoveScale: " + stepModifier.ToString());
+        }
+
         if (Input.GetKeyDown(KeyCode.W) || Input.GetButtonDown("Dup") || Input.GetButtonDown("Triangle")) {
             Move(new Vector3(0, 0, 3));
         }
@@ -287,10 +311,23 @@ public class PlayerMovementScript : MonoBehaviour {
         }
     }
 
-    public bool Move(Vector3 distance) {
+    public bool Move(Vector3 distance)
+    {
         if (GameStateControllerScript.Instance.state != GameStateControllerScript.enGameState.PLAY) { return false; } //Don't let the player move if we're not in play mode
         if (bDoingToss) { return false; } //Don't let the player move while they're being tossed
-        //Debug.Log("In Distance: " + distance);
+
+        //A quick check state to see if we can act on this input, or if it should be our "wantMove" vector
+        if ((canMove || onLog) && !moving)
+        {
+            return DoMove(distance);
+        } else
+        {
+            wantsMove = distance;
+        }
+        return false;
+    }
+    public bool DoMove(Vector3 distance) { 
+
         //So if we're rotated we'll have to rotate our movement direction...
         switch (GameStateControllerScript.Instance.ScreenOrientation)
         {
@@ -344,7 +381,7 @@ public class PlayerMovementScript : MonoBehaviour {
         HopAnimator.Stop(); //To give us a clean reset
         HopAnimator.Play();
         //HopAnimator.clip.frameRate = HopAnimator.clip.frameRate / Time.timeScale;
-        gameObject.transform.DOMove(targetPosition, stepTime).SetEase(Ease.Linear).SetUpdate(true).OnComplete(() => ValidateMoveAndMap());
+        gameObject.transform.DOMove(targetPosition, stepTime*stepModifier).SetEase(Ease.Linear).SetUpdate(true).OnComplete(() => ValidateMoveAndMap());
 
         PlaySound(SFX_Jump);
         return true;
@@ -486,6 +523,7 @@ public class PlayerMovementScript : MonoBehaviour {
 
     public void Reset() {
         // TODO This kind of reset is dirty, refactor might be needed.
+        CharacterBase.transform.localEulerAngles = Vector3.zero;
         body.isKinematic = true;
         transform.position = new Vector3(0, 1, 0);
         transform.localScale = new Vector3(1, 1, 1);

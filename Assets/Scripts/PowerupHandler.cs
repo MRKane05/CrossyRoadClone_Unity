@@ -36,7 +36,8 @@ public class PowerupHandler : MonoBehaviour {
 
     public void OpenMenu()
     {
-
+        PopulatePowerupsLists();
+        ScrubEquippedList();
     }
 
     public void ScrubEquippedList()

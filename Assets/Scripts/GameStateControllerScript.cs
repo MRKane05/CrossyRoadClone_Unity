@@ -154,6 +154,12 @@ public class GameStateControllerScript : MonoBehaviour {
         {
             UISetScreenOrientation(ScreenSet);
         }
+
+        string SelectedCharacter = PlayerPrefs.GetString("SelectedCharacter");
+        if (SelectedCharacter.Length > 2)
+        {
+            SelectCharacter(PlayerPrefs.GetString("SelectedCharacter"));
+        }
     }
 
     public void SetTopScore(int toThis)
@@ -221,7 +227,9 @@ public class GameStateControllerScript : MonoBehaviour {
 
     public void RestartGame()
     {
-        LevelControllerScript.Instance.GameReset(); //PROBLEM: The reset system needs a lot of refinement
+        LevelControllerScript.Instance.player.SetActive(true);
+        LevelControllerScript.Instance.player.GetComponent<PlayerMovementScript>().Reset();
+        LevelControllerScript.Instance.GameReset();
         MainMenu();
         bPassedHalfway = false;
         bBeatTopScore = false;
@@ -367,11 +375,11 @@ public class GameStateControllerScript : MonoBehaviour {
             {
                 if (thisCharacterName == thisCharacter.CharacterName)
                 {
+                    PlayerPrefs.SetString("SelectedCharacter", thisCharacterName);
                     LevelControllerScript.Instance.player.GetComponent<PlayerMovementScript>().SetCharacter(thisCharacter.Character);
                 }
             }
         }
-
         //And after this we need to close our window
         SelectCharacter(false);
     }
