@@ -15,7 +15,7 @@ public class PlayerMovementScript : MonoBehaviour {
 
     public LayerMask stopperLayerMask;
     public LayerMask groundcastMask;
-    float stepTime = 0.3f;
+    float stepTime = 0.25f;
     public float stepModifier = 1f;
 
     public Animation HopAnimator;
@@ -232,18 +232,18 @@ public class PlayerMovementScript : MonoBehaviour {
         if (gameStateController.state == GameStateControllerScript.enGameState.PLAY)
         {
             EagleTimeTicker += Time.deltaTime;
-        }
 
-        if (EagleTimeTicker > EagleWaitTime)
-        {
-            //Debug.Log("Calling Eagle");
-            gameStateController.TriggerEagle(transform.position);
-        }
+            if (EagleTimeTicker > EagleWaitTime)
+            {
+                //Debug.Log("Calling Eagle");
+                gameStateController.TriggerEagle(transform.position);
+            }
 
-        if (backDirectionCount >= maxBackmoves)
-        {
-            //Debug.Log("Call Eagle");
-            gameStateController.TriggerEagle(transform.position);
+            if (backDirectionCount >= maxBackmoves)
+            {
+                //Debug.Log("Call Eagle");
+                gameStateController.TriggerEagle(transform.position);
+            }
         }
     }
 
@@ -401,8 +401,8 @@ public class PlayerMovementScript : MonoBehaviour {
     bool bPlayerGrounded()
     {
         //So lets do a raycast along a strip and see if we're on the ground
-        float span = 0.6f;
-        float raycount = 5f;
+        float span = 0.9f;
+        float raycount = 7f;
         for (int i = 0; i < raycount; i++)
         {
             float t = (float)i / raycount;
@@ -434,6 +434,14 @@ public class PlayerMovementScript : MonoBehaviour {
         if (LevelControllerScript.Instance)
         {
             LevelControllerScript.Instance.PlayerMoved();
+        }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.gameObject.name.Contains("Trunk"))   //We're resting on a trunk. Lets make sure we can move again
+        {
+            moving = false;
         }
     }
 
@@ -476,7 +484,7 @@ public class PlayerMovementScript : MonoBehaviour {
     public void GameOver(enDieType DieType, bool bSquashFlat = true) {
         if (bDoingToss) { return; } //Don't let our character die while we're being tossed
         if ((bPlayerInvincible || bPlayerGhost) && (DieType == enDieType.TRAIN || DieType == enDieType.CAR)) { return; }
-
+        EagleTimeTicker = 0; //Reset our eagle timer just to be sure
 
         //We need to see if we've got an enabled powerup and if it has any effect here
         if (EquippedPowerup)
@@ -523,6 +531,7 @@ public class PlayerMovementScript : MonoBehaviour {
 
     public void Reset() {
         // TODO This kind of reset is dirty, refactor might be needed.
+        EagleTimeTicker = 0;
         CharacterBase.transform.localEulerAngles = Vector3.zero;
         body.isKinematic = true;
         transform.position = new Vector3(0, 1, 0);

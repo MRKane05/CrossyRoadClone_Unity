@@ -19,6 +19,18 @@ public class PowerupHandler : MonoBehaviour {
     public GameObject purchaseMenu;
 
 
+    public Sprite powerupSprite(string powerupName)
+    {
+        foreach(Powerup_Item thisPowerup in PowerupItems)
+        {
+            if (thisPowerup.PowerupName == powerupName)
+            {
+                return thisPowerup.powerupSprite;
+            }
+        }
+        return null;
+    }
+
     void Start()
     {
         if (Instance == null)

@@ -17,6 +17,7 @@ public class Powerup_Item
     public int powerupCost = 125;
     public int count = 0;
     public bool bEnabledThisRun = false;
+    public Sprite powerupSprite;
 
     public Powerup_Item(string newPowerupName, int newPowerupCount)
     {
@@ -376,6 +377,7 @@ public class GameStateControllerScript : MonoBehaviour {
                 if (thisCharacterName == thisCharacter.CharacterName)
                 {
                     PlayerPrefs.SetString("SelectedCharacter", thisCharacterName);
+                    PlayerPrefs.Save();
                     LevelControllerScript.Instance.player.GetComponent<PlayerMovementScript>().SetCharacter(thisCharacter.Character);
                 }
             }

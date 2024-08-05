@@ -12,7 +12,7 @@ public class EagleScript : MonoBehaviour {
 
     public void SetEagleMovement(Vector3 StartPosition, Vector3 EndPosition)
     {
-        if (EagleActive) { return; }
+        if (EagleActive || GameStateControllerScript.Instance.state != GameStateControllerScript.enGameState.PLAY) { return; }
 
         setEagleVisibility(true);
         gameObject.transform.position = StartPosition;
@@ -23,7 +23,7 @@ public class EagleScript : MonoBehaviour {
 
     void setEagleVisibility(bool state)
     {
-        EagleActive = true;
+        EagleActive = state;
         for(int i=0; i<EagleObjects.Length; i++)
         {
             EagleObjects[i].SetActive(state);

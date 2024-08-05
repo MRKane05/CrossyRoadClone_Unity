@@ -18,6 +18,7 @@ public class Powerup : MonoBehaviour
     public CanvasGroup Indicator_CanvasGroup;
     public Image Indicator_FillImage;
     public GameObject PowerupMarker;
+    public Sprite powerupIcon;
 
 
     public Vector3 mountOffset = new Vector3(0, 1.6f, 0);

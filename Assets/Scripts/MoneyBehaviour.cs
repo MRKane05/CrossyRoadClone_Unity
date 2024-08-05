@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MoneyBehaviour : MonoBehaviour {
+    bool bBeenCollected = false;
     void OnTriggerEnter(Collider other)
     {
         // When collide with player, flatten it!
-        if (other.gameObject.tag == "Player")
+        if (other.gameObject.tag == "Player" && !bBeenCollected)
         {
+            bBeenCollected = true;
             //We need to collect this, play some effect/sound and then add the score to our total. Lets start simple.
             GameStateControllerScript.Instance.ChangeCoinTotal(1);
             GetComponent<AudioSource>().Play();

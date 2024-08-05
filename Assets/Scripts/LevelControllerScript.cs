@@ -35,6 +35,9 @@ public class LevelControllerScript : MonoBehaviour {
     int nextPowerupLine = 0;
     int maxPowerupSpread = 0;
     int powerupRandom = 0;
+    public List<GameObject> activatedPowerups = new List<GameObject>();
+    public GameObject powerupButtonsBase;
+    public GameObject powerupButtonPrefab;
 
     void Awake()
     {
@@ -61,21 +64,90 @@ public class LevelControllerScript : MonoBehaviour {
 
     public void setPowerups(List<string> newPowerups)
     {
-        equippedPowerups = newPowerups;
+        //equippedPowerups = newPowerups;
+        //Lets add buttons with the powerups for our system to use. Man I didn't think this out did I?
+        foreach(string thisPowerup in newPowerups)
+        {
+            foreach(Powerup_Item targetPowerup in PowerupHandler.Instance.PowerupItems)
+            {
+                if (targetPowerup.PowerupName == thisPowerup)
+                {
+                    GameObject newPowerupButton = Instantiate(powerupButtonPrefab, powerupButtonsBase.transform);
+                    LivePowerupButton newButtonScript = newPowerupButton.GetComponent<LivePowerupButton>();
+                    newButtonScript.setupButton(targetPowerup.powerupPrefab, targetPowerup.powerupSprite);
+                } 
+            }
+        }
+    }
+
+    public bool addPowerupToLevel(GameObject thisPowerupPrefab)
+    {
+        //So we've got to look at where the player is, and take the next three (optimially) lines ahead of the player
+        //Keep looping until we find one that's not water (because I can't be bothered programming a powerup that's on a log) and then
+        //Look for a valid placement as we would a coin, then kick forward a line if we fail. Simple.
+        //We need to get the player row :)
+        int playerRow = Mathf.RoundToInt(player.transform.position.z / 3f);
+        //We need to figure out where we're going to start for our row check
+        int rowStart = Mathf.FloorToInt(Random.RandomRange(1, 3));
+        bool bLineFound = false;
+        int reps = 0;
+        while (!bLineFound && reps < 6)
+        {
+            LineHandler targetLine = SpawnedLines[playerRow + rowStart + reps];
+            if (targetLine.LineType != LineHandler.enLineType.WATER)
+            {
+                bLineFound = addPowerupToLine(playerRow + rowStart + reps, thisPowerupPrefab);
+                reps++; //Go forward a line
+            } else
+            {
+                reps++;
+            }
+        }
+        return bLineFound;
+    }
+
+    bool addPowerupToLine(int lineNumber, GameObject thisPowerup)
+    {
+        LineHandler targetLine = SpawnedLines[lineNumber];
+        //Debug.LogError("Powerup Dropped on Line: " + lineNumber);
+        int cycles = 5;
+        bool bCleared = false;
+        Vector3 position = Vector3.zero;
+        while (!bCleared && cycles > 0)
+        {
+            position = new Vector3(Random.RandomRange(-9.5f, 9.5f), 0f, targetLine.gameObject.transform.position.z);  //We'll have to have some height stuff sorted out here
+            if (!Physics.CheckSphere(position, 0.1f, stopperLayerMask))
+            {
+                bCleared = true;
+            }
+            cycles--;
+        }
+        if (!bCleared)
+        {
+            return false;
+        }
+        GameObject newPowerup = Instantiate(thisPowerup);
+        Debug.Log("Added powerup: " + thisPowerup.gameObject.name);
+        //newCoin.transform.localScale = Vector3.one;
+        newPowerup.transform.localPosition = position;	//Who cares if it gets stuck in a tree or something
+        activatedPowerups.Add(newPowerup);
+        return true;
     }
 
     public void Play()
     {
         currentPowerup = 0;
         nextPowerupLine = 0;
-
+        /*
         if (equippedPowerups.Count > 0)
         {
             maxPowerupSpread = Mathf.FloorToInt(((float)GameStateControllerScript.Instance.score_top / equippedPowerups.Count) * Random.Range(1.5f, 2f)); //Make our spread a little more trying
         }
+        */
         //Unlock and set everything in action :)
         player.GetComponent<PlayerMovementScript>().canMove = true;
         camera.GetComponent<CameraMovementScript>().moving = true;
+        /*
         nextPowerupLine = Mathf.Max(minPowerupSpacing, Random.RandomRange(minPowerupSpacing, maxPowerupSpread));
         //We need to add powerups until our visual lines are exhaused here, and then keep adding them as new lines are made
         while (nextPowerupLine < SpawnedLines.Count && currentPowerup < equippedPowerups.Count)
@@ -96,6 +168,7 @@ public class LevelControllerScript : MonoBehaviour {
                 nextPowerupLine++;
             }
         }
+        */
     }
 
     int TryToAddPowerup(int lineNumber)
@@ -163,6 +236,23 @@ public class LevelControllerScript : MonoBehaviour {
         lines.Clear();
         lines = new Dictionary<int, GameObject>();
 
+        foreach(GameObject thisPowerup in activatedPowerups)
+        {
+            if (thisPowerup)
+            {
+                Destroy(thisPowerup);
+            }
+        }
+
+        activatedPowerups.Clear();
+        activatedPowerups = new List<GameObject>();
+
+        //Clear our powerups buttons
+        foreach (Transform child in powerupButtonsBase.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
         //we need to put our character back in it's spot
         player.transform.position = Vector3.up * 1f;     //Set to zero and up 1 unit
         player.transform.localScale = Vector3.one;      //Reset scale just in case we've had something different change
@@ -196,7 +286,7 @@ public class LevelControllerScript : MonoBehaviour {
 
             AddNewMapLine(mapLine, (mapLine) * 3);
             mapLine++;
-
+            /*
             //Seee if we can drop a powerup on this line
             if (SpawnedLines.Count - 1 > nextPowerupLine && currentPowerup < equippedPowerups.Count)
             {
@@ -217,12 +307,8 @@ public class LevelControllerScript : MonoBehaviour {
                     nextPowerupLine++;
                 }
             }
+            */
         }
-    }
-
-    public void addPowerupToLine(GameObject thisLine)
-    {
-
     }
 
     public void AddNewMapLine(int z, float newPosition)
