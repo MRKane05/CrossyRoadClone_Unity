@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 
 public class LevelControllerScript : MonoBehaviour {
     public LayerMask stopperLayerMask;
@@ -130,6 +131,11 @@ public class LevelControllerScript : MonoBehaviour {
         Debug.Log("Added powerup: " + thisPowerup.gameObject.name);
         //newCoin.transform.localScale = Vector3.one;
         newPowerup.transform.localPosition = position;	//Who cares if it gets stuck in a tree or something
+        Vector3 objectScale = newPowerup.transform.localScale;
+        newPowerup.transform.localScale = Vector3.zero;
+        //Do a fade in and punch animation
+        newPowerup.transform.DOScale(objectScale, 0.5f).OnComplete(() => { newPowerup.transform.DOPunchScale(Vector3.one * 1.125f, 0.5f); });
+
         activatedPowerups.Add(newPowerup);
         return true;
     }

@@ -8,6 +8,7 @@ using DG.Tweening;
 public class PowerupMenuItem : MonoBehaviour {
     public TextMeshProUGUI ItemTitle;
     public GameObject itemDisplayPosition;
+    public Image itemIcon;
     [HideInInspector]
     public string itemName = "";
     public int itemCount = 0;
@@ -26,6 +27,7 @@ public class PowerupMenuItem : MonoBehaviour {
         itemName = newTitle;
         itemCount = newItemCount;
         itemCost = newPowerupCost;
+        itemIcon.sprite = PowerupHandler.Instance.powerupSprite(newTitle);
         setButtonText(newTitle, itemCount);
         if (newDisplayModel)
         {

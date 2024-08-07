@@ -44,9 +44,9 @@ public class Powerup_HampsterBall : Powerup {
 
     public void Update()
     {
-        if (Time.time - pulseTime > 1 && bMounted)
+        if (Time.unscaledTime - pulseTime > 1)
         {
-            pulseTime = Time.time;
+            pulseTime = Time.unscaledTime;
             transform.DOShakeScale(0.5f).SetUpdate(true);
         }
 

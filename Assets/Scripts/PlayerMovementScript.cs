@@ -283,6 +283,7 @@ public class PlayerMovementScript : MonoBehaviour {
 		}
 
         //So we need something to handle our player speed tweaks for our hardcore users to give me some real numbers to work with
+        /*
         if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetButtonDown("Left Shoulder"))
         {
             stepModifier = Mathf.Clamp(stepModifier - 0.1f, 0.2f, 1.5f);
@@ -293,7 +294,7 @@ public class PlayerMovementScript : MonoBehaviour {
         {
             stepModifier = Mathf.Clamp(stepModifier + 0.1f, 0.2f, 1.5f);
             debugPanel.setDisplayText("MoveScale: " + stepModifier.ToString());
-        }
+        }*/
 
         if (Input.GetKeyDown(KeyCode.W) || Input.GetButtonDown("Dup") || Input.GetButtonDown("Triangle")) {
             Move(new Vector3(0, 0, 3));
@@ -352,12 +353,28 @@ public class PlayerMovementScript : MonoBehaviour {
 
         //PROBLEM: Need to see if we're moving into something
         // Don't move if blocked by obstacle.
-        
+        //Lets change this to something a bit more flexible :)
+        RaycastHit hit;
+        // Does the ray intersect any objects excluding the player layer
+        if (Physics.Raycast(transform.position, distance.normalized, out hit, 3, stopperLayerMask))
+        {
+            if (distance.z != 0)
+            {
+                return false; //We can't move forward/backwards here
+            }
+            else
+            {
+                //We need to position to where our hit was minus our volume
+                newPosition = hit.point - distance.normalized * 0.75f;
+            }
+        }
+        /*
         if (Physics.CheckSphere(newPosition + new Vector3(0.0f, 0.5f, 0.0f), 0.1f, stopperLayerMask))
         {
             Debug.Log("Got Collision With Move");
             return false;
         }
+        */
 
         target = newPosition;
 
@@ -532,6 +549,7 @@ public class PlayerMovementScript : MonoBehaviour {
     public void Reset() {
         // TODO This kind of reset is dirty, refactor might be needed.
         EagleTimeTicker = 0;
+        backDirectionCount = 0; //So we can't get trapped by the eagle kill
         CharacterBase.transform.localEulerAngles = Vector3.zero;
         body.isKinematic = true;
         transform.position = new Vector3(0, 1, 0);

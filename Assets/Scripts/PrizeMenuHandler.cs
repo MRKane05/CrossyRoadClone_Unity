@@ -177,9 +177,9 @@ public class PrizeMenuHandler : MonoBehaviour {
             displayAnchor.transform.localEulerAngles = new Vector3(0, 125, 0);  //Set our angle
             displayAnchor.transform.DOShakeScale(0.5f, 100).SetUpdate(true).OnComplete(() => { bCanRotate = true; });
 
-            displayIcon.GetComponent<Image>().sprite = PowerupIcon;
+            displayIcon.GetComponent<Image>().sprite = WonPowerup.powerupSprite;
 
-            WinningTitle.text = WonPowerup.PowerupName;// "POWERUP";
+            WinningTitle.text = WonPowerup.PowerupName;
             ourAudio.clip = sound_Powerup;
             ourAudio.Play();
 

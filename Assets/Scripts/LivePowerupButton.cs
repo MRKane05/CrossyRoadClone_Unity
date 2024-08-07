@@ -7,6 +7,7 @@ using DG.Tweening;
 public class LivePowerupButton : MonoBehaviour {
     public Image ButtonIcon;
     public GameObject powerupPrefab;
+    public AudioClip dropSuccess, dropFail;
     public void setupButton(GameObject newPowerupPrefab, Sprite powerupSprite)
     {
         powerupPrefab = newPowerupPrefab;
@@ -21,10 +22,19 @@ public class LivePowerupButton : MonoBehaviour {
         //We need to remove our button as it's been successful :)
         if (bPowerupAdded)
         {
-            transform.DOShakeScale(0.75f).OnComplete(() => { Destroy(gameObject); });
+            Sequence sequence = DOTween.Sequence();
+            sequence.Append(transform.DOShakeScale(0.75f));
+            sequence.Append(transform.DOScale(0, 1f).OnComplete(() => { Destroy(gameObject); }));
         } else
         {
             transform.DOShakePosition(0.75f);
         }
+        playAudio(bPowerupAdded);
+    }
+
+    void playAudio(bool state)
+    {
+        gameObject.GetComponent<AudioSource>().clip = state ? dropSuccess : dropFail;
+        gameObject.GetComponent<AudioSource>().Play();
     }
 }

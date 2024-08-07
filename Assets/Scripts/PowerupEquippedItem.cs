@@ -1,16 +1,19 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
 public class PowerupEquippedItem : MonoBehaviour {
     public TextMeshProUGUI itemTitle;
+    public Image ButtonIcon;
     public string itemName = "";
 
     public void setItem(string newItemName)
     {
         itemName = newItemName;
-        itemTitle.text = itemName;
+        //itemTitle.text = itemName;
+        ButtonIcon.sprite = PowerupHandler.Instance.powerupSprite(newItemName);
     }
 
     public void RemoveItemFromList()

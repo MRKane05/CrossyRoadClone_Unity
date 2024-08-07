@@ -77,6 +77,7 @@
      <Compile Include="Assets\Scripts\LevelManager.cs" />
      <Compile Include="Assets\Scripts\LineCoinDistributor.cs" />
      <Compile Include="Assets\Scripts\LineHandler.cs" />
+     <Compile Include="Assets\Scripts\LivePowerupButton.cs" />
      <Compile Include="Assets\Scripts\MoneyBehaviour.cs" />
      <Compile Include="Assets\Scripts\MusicControl.cs" />
      <Compile Include="Assets\Scripts\OptionsButton.cs" />
