@@ -64,17 +64,27 @@ public class PlayerMovementScript : MonoBehaviour {
     private Dictionary<Material, Material> materialMap = new Dictionary<Material, Material>();
 
     float AnimationFramerate = 30;
+
+    GameObject spawnedCharacter;
+    GameObject currentCharacter;
     public void SetCharacter(GameObject thisCharacter)
     {
-        //Clear anything we might have
+        currentCharacter = thisCharacter;
+        currentCharacter = thisCharacter;
+
+        //Clear anything we might have (assuming it's not already cleared)
+        if (spawnedCharacter)
+        {
+            Destroy(spawnedCharacter);
+        }
         foreach (Transform child in CharacterBase.transform)
         {
             Destroy(child.gameObject);
         }
 
-        GameObject newCharacter = Instantiate(thisCharacter, CharacterBase.transform);
-        newCharacter.transform.localPosition = Vector3.zero;
-        newCharacter.transform.localEulerAngles = Vector3.zero;
+        spawnedCharacter = Instantiate(thisCharacter, CharacterBase.transform);
+        spawnedCharacter.transform.localPosition = Vector3.zero;
+        spawnedCharacter.transform.localEulerAngles = Vector3.zero;
 
         //Sort out our materials as we'll be changing them for ghost mode
         materialMap.Clear();
@@ -83,7 +93,7 @@ public class PlayerMovementScript : MonoBehaviour {
         playerMaterials.Clear();
         playerMaterials = new List<Material>();
 
-        MeshRenderer[] playerRenderers = newCharacter.GetComponentsInChildren<MeshRenderer>();
+        MeshRenderer[] playerRenderers = spawnedCharacter.GetComponentsInChildren<MeshRenderer>();
         //Debug.LogError("playerRenderers count: " + playerRenderers.Length);
 
         foreach (MeshRenderer thisRenderer in playerRenderers)
@@ -254,7 +264,7 @@ public class PlayerMovementScript : MonoBehaviour {
 
     private void TickEagle()
     {
-        if (gameStateController.state == GameStateControllerScript.enGameState.PLAY)
+        if (gameStateController.state == GameStateControllerScript.enGameState.PLAY && !onLog)
         {
             EagleTimeTicker += Time.deltaTime;
 
@@ -523,7 +533,7 @@ public class PlayerMovementScript : MonoBehaviour {
 
     float powerupInvincibleStart = 0;
 
-    public void GameOver(enDieType DieType, bool bSquashFlat = true) {
+    public void GameOver(enDieType DieType, GameObject DieObject = null) {
         if (bDoingToss) { return; } //Don't let our character die while we're being tossed
         if ((bPlayerInvincible || bPlayerGhost) && (DieType == enDieType.TRAIN || DieType == enDieType.CAR)) { return; }
         EagleTimeTicker = 0; //Reset our eagle timer just to be sure
@@ -557,8 +567,21 @@ public class PlayerMovementScript : MonoBehaviour {
             killMoveTween();
 
             Vector3 scale = transform.localScale;
-            transform.localScale = new Vector3(scale.x, scale.y * 0.1f, scale.z);
-            PlaySound(SFX_Hit);
+            //So we've got to figure out if we hit the front of the car, or the side of the car...
+            //Debug.LogError("Car Dot: " + Vector3.Dot(Vector3.right, (transform.position - DieObject.transform.position).normalized));
+            if (Mathf.Abs(Vector3.Dot(Vector3.right, (transform.position - DieObject.transform.position).normalized)) > 0.9f)
+            {
+                //Assume we got run over
+                transform.localScale = new Vector3(scale.x, scale.y * 0.1f, scale.z);
+                PlaySound(SFX_Hit);
+            } else
+            {
+                //we've jumped into the side of this vehicle
+                transform.localScale = new Vector3(scale.x, scale.y, scale.z * 0.1f);
+                spawnedCharacter.transform.SetParent(DieObject.transform); //Stick us to the vehicle
+                PlaySound(SFX_HitSide);
+            }
+            
         }
         if (DieType == enDieType.WATER)
         {
@@ -582,5 +605,6 @@ public class PlayerMovementScript : MonoBehaviour {
         transform.rotation = Quaternion.identity;
         moving = false;
         score = 0;
+        SetCharacter(currentCharacter);
     }
 }

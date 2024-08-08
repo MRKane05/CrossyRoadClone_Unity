@@ -83,7 +83,7 @@ public class CarScript : MonoBehaviour {
             PlayerMovementScript PlayerMove = other.GetComponent<PlayerMovementScript>();
             if (PlayerMove)
             {
-                PlayerMove.GameOver(PlayerMovementScript.enDieType.CAR);
+                PlayerMove.GameOver(PlayerMovementScript.enDieType.CAR, gameObject);
             }
         }
     }

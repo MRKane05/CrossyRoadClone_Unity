@@ -30,8 +30,25 @@ public class RoadCarGenerator : MonoBehaviour {
             interval = Random.Range(intervalRange.x, intervalRange.y);
         }
 
-        elapsedTime = 0.0f;
+        elapsedTime = interval; //As we'll be pre-populating
         cars = new List<GameObject>();
+
+        //We could do with pre-populating our cars
+        prepopulateLine();
+    }
+
+    void prepopulateLine()
+    {
+        float distance = rightX - leftX;
+        float travelTime = distance / speed;
+        int hazardCount = Mathf.CeilToInt(travelTime / interval);
+
+        for (int i=0; i<hazardCount; i++)
+        {
+            float span = (float)i / (float)hazardCount;
+            Vector3 position = transform.position + new Vector3(Mathf.Lerp(rightX, leftX, span) * (direction == Direction.Right ? 1f : -1f), 0.6f, 0);
+            SpawnVehicle(position);
+        }
     }
 
     public void Update() {
@@ -39,25 +56,8 @@ public class RoadCarGenerator : MonoBehaviour {
 
         if (elapsedTime > interval) {
             elapsedTime = 0.0f;
-
-            // TODO extract 0.375f and -0.5f to outside -- probably along with genericization
             Vector3 position = transform.position + new Vector3(direction == Direction.Left ? rightX : leftX, 0.6f, 0);
-            GameObject o = (GameObject)Instantiate(carPrefabs[Random.Range(0, carPrefabs.Length)], position, Quaternion.Euler(-90, 90, 0));
-
-            CarScript ourCarScript = o.GetComponent<CarScript>();
-            ourCarScript.SetSpeed((int)direction * speed);
-
-            if (CarColors.Length >0)
-            {
-                ourCarScript.SetMaterialColor(CarColors[Random.Range(0, CarColors.Length)]);
-            }
-
-            if (direction < 0)
-                o.transform.rotation = Quaternion.Euler(0, 0, 0);
-            else
-                o.transform.rotation = Quaternion.Euler(0, 180, 0);
-            
-            cars.Add(o);
+            SpawnVehicle(position);
         }
 
         foreach (GameObject o in cars.ToArray()) {
@@ -66,6 +66,28 @@ public class RoadCarGenerator : MonoBehaviour {
                 cars.Remove(o);
             }
         }
+    }
+
+    void SpawnVehicle(Vector3 position)
+    {
+
+        //Vector3 position = transform.position + new Vector3(direction == Direction.Left ? rightX : leftX, 0.6f, 0);
+        GameObject o = (GameObject)Instantiate(carPrefabs[Random.Range(0, carPrefabs.Length)], position, Quaternion.Euler(-90, 90, 0));
+
+        CarScript ourCarScript = o.GetComponent<CarScript>();
+        ourCarScript.SetSpeed((int)direction * speed);
+
+        if (CarColors.Length > 0)
+        {
+            ourCarScript.SetMaterialColor(CarColors[Random.Range(0, CarColors.Length)]);
+        }
+
+        if (direction < 0)
+            o.transform.rotation = Quaternion.Euler(0, 0, 0);
+        else
+            o.transform.rotation = Quaternion.Euler(0, 180, 0);
+
+        cars.Add(o);
     }
 
     public void OnDestroy() {
