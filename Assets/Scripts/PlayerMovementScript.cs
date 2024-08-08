@@ -165,7 +165,7 @@ public class PlayerMovementScript : MonoBehaviour {
         bool bHasClear = false;
         Vector3 targetEnd = endPosition;
 
-        while (bHasClear && clearOffset < TossOffsetList.Count)
+        while (!bHasClear && clearOffset < TossOffsetList.Count)
         {
             targetEnd = endPosition + TossOffsetList[clearOffset];
             targetEnd = makeModal(targetEnd);
