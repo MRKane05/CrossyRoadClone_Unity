@@ -31,7 +31,7 @@ public class Powerup_HampsterBall : Powerup {
         PlayerMovementScript playerMove = PlayerCharacter.GetComponent<PlayerMovementScript>();
         playerMove.killMoveTween(); //Stop our movement
         //Technically we could just call a backward move
-        bool bEscaped = playerMove.Move(new Vector3(0, 0, -3));
+        bool bEscaped = playerMove.DoMove(new Vector3(0, 0, -3));
         RemovePowerup();
 
         if (ourAudio && Sound_OnActivate)

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using DG.Tweening;
 
 public class PlayerMovementScript : MonoBehaviour {
-    public enum enDieType { NULL, CAR, TRAIN, WATER, EAGLE}
+    public enum enDieType { NULL, CAR, TRAIN, WATER, EAGLE }
 
     public GameStateControllerScript gameStateController;
     public UI_MoveSpeedDisplay debugPanel;
@@ -25,6 +25,7 @@ public class PlayerMovementScript : MonoBehaviour {
 
     public int minX = -4;
     public int maxX = 4;
+    public int XMoveLimit = 9;
 
     private bool moving;
 
@@ -124,7 +125,7 @@ public class PlayerMovementScript : MonoBehaviour {
     public void SetGhost(bool bState)
     {
         bPlayerGhost = bState;
-        foreach(Material instanceMat in playerMaterials)
+        foreach (Material instanceMat in playerMaterials)
         {
             instanceMat.SetFloat("_Alpha", bState ? 0f : 1f);
         }
@@ -149,6 +150,8 @@ public class PlayerMovementScript : MonoBehaviour {
         }
     }
 
+    List<Vector3> TossOffsetList = new List<Vector3>() { Vector3.zero, Vector3.forward * 3f, Vector3.forward * -3f, Vector3.right * 3f, Vector3.right * -3f, new Vector3(-3, 0, 3), new Vector3(3, 0, 3), new Vector3(-3, 0, -3), new Vector3(3, 0 - 3), Vector3.forward * 6f, new Vector3(-3, 0, 6), new Vector3(3, 0, 6) };
+
     public IEnumerator doCharacterToss(Vector3 startPosition, float tossDistance)
     {
         bDoingToss = true;
@@ -156,8 +159,30 @@ public class PlayerMovementScript : MonoBehaviour {
         startPosition = makeModal(startPosition);
         Vector3 endPosition = startPosition + Vector3.forward * tossDistance;
         endPosition = makeModal(endPosition);
+        //we need to make sure that we're not tossing our player into a tree or something, and if we are to deviate the landing position to miss
+        //Which I guess means we need some sort of checking pattern to see if there's a clear...
+        int clearOffset = 0;
+        bool bHasClear = false;
+        Vector3 targetEnd = endPosition;
 
-        Debug.Log("EndPosition: " + endPosition);
+        while (bHasClear && clearOffset < TossOffsetList.Count)
+        {
+            targetEnd = endPosition + TossOffsetList[clearOffset];
+            targetEnd = makeModal(targetEnd);
+            if (Physics.CheckSphere(targetEnd + new Vector3(0.0f, 0.5f, 0.0f), 0.1f, stopperLayerMask) || Mathf.Abs(targetEnd.x) > XMoveLimit)
+            {
+                Debug.Log("Got Collision With Toss");
+                clearOffset++;
+            } else
+            {
+                Debug.Log("Did Toss, clearOffset: " + clearOffset);
+                bHasClear = true;
+            }
+        }
+
+        //Do we have a clear?
+
+        Debug.Log("EndPosition: " + targetEnd);
         yield return null;
         float startTime = Time.time;
         float tossDuration = 1f;
@@ -165,7 +190,7 @@ public class PlayerMovementScript : MonoBehaviour {
         while (Time.time-startTime < tossDuration)
         {
             float positionLerp = Mathf.Clamp01((Time.time - startTime) / tossDuration);
-            transform.position = Vector3.Lerp(startPosition, endPosition, positionLerp);
+            transform.position = Vector3.Lerp(startPosition, targetEnd, positionLerp);
             transform.position += Vector3.up * tossHeight * tossHeightCurve.Evaluate(positionLerp);
             if (transform.position.z- lastLockPosition >= 3) {
                 lastLockPosition = transform.position.z;
@@ -173,7 +198,7 @@ public class PlayerMovementScript : MonoBehaviour {
             }
             yield return null;
         }
-        transform.position = endPosition;
+        transform.position = targetEnd;
         bDoingToss = false;
     }
 
