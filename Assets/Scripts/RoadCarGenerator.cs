@@ -9,9 +9,13 @@ public class RoadCarGenerator : MonoBehaviour {
 
     public Direction direction;
     public Vector2 speedRange = new Vector2(5f, 15f);
-    float speed = 2.0f;
-    public Vector2 intervalRange = new Vector2(2, 5);
-    float interval = 6.0f;
+    public Vector2 hazardDensityRange = new Vector2(2f, 5f);
+    public Vector2 gapOddsRange = new Vector2(0.1f, 0.3f);   //What are the odds of a car not being spawned and having a gap in the traffic?
+    public float gapOdds = 0.3f;
+    public float hazardDensity = 3;
+    public float speed = 2.0f;
+    //public Vector2 intervalRange = new Vector2(2, 5);
+    public float interval = 6.0f;
     public float leftX = -20.0f;
     public float rightX = 20.0f;
 
@@ -22,12 +26,29 @@ public class RoadCarGenerator : MonoBehaviour {
     private List<GameObject> cars = new List<GameObject>();
 
     public Color[] CarColors;
+    public float Difficulty = 0.5f;
 
     public void Start() {
+        //So basically we need a difficulty measure here
+        float LineValue = transform.position.z / 3f;
+        Difficulty = LineValue / GameStateControllerScript.Instance.maxDifficultyLine;
+        float Difficulty_Min = Mathf.Lerp(Difficulty, 0f, 0.25f);
+        float Difficulty_Max = Mathf.Lerp(Difficulty, 1f, 0.25f);
         if (randomizeValues) {
             direction = Random.value < 0.5f ? Direction.Left : Direction.Right;
-            speed = Random.Range(speedRange.x, speedRange.y);
-            interval = Random.Range(intervalRange.x, intervalRange.y);
+
+            //So these values need some sort of bias for the difficulty...
+            speed = Random.Range(Mathf.Lerp(speedRange.x, speedRange.y, Difficulty_Min),
+                Mathf.Lerp(speedRange.x, speedRange.y, Difficulty_Max));
+            hazardDensity = Random.Range(Mathf.Lerp(hazardDensityRange.x, hazardDensityRange.y, Difficulty_Min),
+                Mathf.Lerp(hazardDensityRange.x, hazardDensityRange.y, Difficulty_Max));
+
+            gapOdds = Random.Range(Mathf.Lerp(gapOddsRange.y, gapOddsRange.x, Difficulty_Min),
+                Mathf.Lerp(gapOddsRange.y, gapOddsRange.x, Difficulty_Max));
+
+            float distance = rightX - leftX;
+            float travelTime = distance / speed;
+            interval = travelTime / hazardDensity;
         }
 
         elapsedTime = interval; //As we'll be pre-populating
@@ -41,13 +62,16 @@ public class RoadCarGenerator : MonoBehaviour {
     {
         float distance = rightX - leftX;
         float travelTime = distance / speed;
-        int hazardCount = Mathf.CeilToInt(travelTime / interval);
+        int hazardDensity = Mathf.CeilToInt(travelTime / interval);
 
-        for (int i=0; i<hazardCount; i++)
+        for (int i=0; i<hazardDensity; i++)
         {
-            float span = (float)i / (float)hazardCount;
+            float span = (float)i / (float)hazardDensity;
             Vector3 position = transform.position + new Vector3(Mathf.Lerp(rightX, leftX, span) * (direction == Direction.Right ? 1f : -1f), 0.6f, 0);
-            SpawnVehicle(position);
+            if (Random.value > gapOdds)
+            {
+                SpawnVehicle(position);
+            }
         }
     }
 
@@ -57,7 +81,10 @@ public class RoadCarGenerator : MonoBehaviour {
         if (elapsedTime > interval) {
             elapsedTime = 0.0f;
             Vector3 position = transform.position + new Vector3(direction == Direction.Left ? rightX : leftX, 0.6f, 0);
-            SpawnVehicle(position);
+            if (Random.value > gapOdds)
+            {
+                SpawnVehicle(position);
+            }
         }
 
         foreach (GameObject o in cars.ToArray()) {

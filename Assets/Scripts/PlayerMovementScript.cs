@@ -63,8 +63,6 @@ public class PlayerMovementScript : MonoBehaviour {
     public List<Material> playerMaterials = new List<Material>();
     private Dictionary<Material, Material> materialMap = new Dictionary<Material, Material>();
 
-    float AnimationFramerate = 30;
-
     GameObject spawnedCharacter;
     GameObject currentCharacter;
     public void SetCharacter(GameObject thisCharacter)
@@ -214,7 +212,6 @@ public class PlayerMovementScript : MonoBehaviour {
 
     public void Start() {
         ourAudio = gameObject.GetComponent<AudioSource>();
-        AnimationFramerate = HopAnimator.clip.frameRate;
         setTimeScale(1f);
         SetCharacter(DefaultCharacter);
 

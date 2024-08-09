@@ -85,7 +85,8 @@ public class GameStateControllerScript : MonoBehaviour {
     bool bBeatTopScore = false;
     int passedIntiger = 1; //This will be multiplied by 25 to mark milestones
 
-
+    //[HideInInspector]
+    public float maxDifficultyLine = 20f;
 
     public void UISetScreenOrientation(string orientation)
     {

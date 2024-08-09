@@ -238,6 +238,8 @@ public class LevelControllerScript : MonoBehaviour {
         SpawnedLines.Clear();
         SpawnedLines = new List<LineHandler>();
 
+        playerHighestRow = 0;
+
         //We should clear our dictionary also (shame this can't be sent through as some sort of self-destruct message)
         lines.Clear();
         lines = new Dictionary<int, GameObject>();
@@ -284,7 +286,6 @@ public class LevelControllerScript : MonoBehaviour {
 
     public void PlayerMoved()
     {
-        //if (player.transform.position.z > playerHighest) {  //we've moved forward\
         playerHighest = Mathf.Max(playerHighest, player.transform.position.z);
         playerHighestRow = Mathf.FloorToInt(playerHighest / 3f);
 
@@ -292,28 +293,6 @@ public class LevelControllerScript : MonoBehaviour {
 
             AddNewMapLine(mapLine, (mapLine) * 3);
             mapLine++;
-            /*
-            //Seee if we can drop a powerup on this line
-            if (SpawnedLines.Count - 1 > nextPowerupLine && currentPowerup < equippedPowerups.Count)
-            {
-                
-                //nextPowerupLine += powerupRandom;
-                Debug.Log("NextPowerupLine: " + nextPowerupLine);
-                int PowerupReturn = TryToAddPowerup(nextPowerupLine);
-                if (PowerupReturn > 0)
-                {
-                    maxPowerupSpread = Mathf.FloorToInt(((float)GameStateControllerScript.Instance.score_top / equippedPowerups.Count) * Random.Range(1.5f, 2.5f)); //Make our spread a little more trying
-                    powerupRandom = Mathf.Max(minPowerupSpacing, Random.RandomRange(minPowerupSpacing, maxPowerupSpread));
-                    Debug.Log("Powerup Random: " + powerupRandom);
-                    nextPowerupLine += powerupRandom;
-                }
-                else
-                {
-                    Debug.Log("Moved Line Forward");
-                    nextPowerupLine++;
-                }
-            }
-            */
         }
     }
 
