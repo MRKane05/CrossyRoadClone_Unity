@@ -10,7 +10,7 @@ public class TrainGenerator : MonoBehaviour
 
     public Direction direction;
     public float speed = 2.0f;
-    public Vector2 intervalRange = new Vector2(6, 12);
+    public Vector2 intervalRange = new Vector2(3, 8);
     private float interval = 6f;
     public float leftX = -20.0f;
     public float rightX = 20.0f;

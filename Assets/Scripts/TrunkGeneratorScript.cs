@@ -6,6 +6,14 @@ public class TrunkGeneratorScript : MonoBehaviour {
     public enum Direction { Left = -1, Right = 1 };
 
     public bool randomizeValues = false;
+    public Vector2 speedRange = new Vector2(2f, 5f);
+    public Vector2 hazardDensityRange = new Vector2(4f, 1f);
+    public Vector2 gapOddsRange = new Vector2(0.1f, 0.5f);   //What are the odds of a car not being spawned and having a gap in the traffic?
+    public Vector2 lengthRange = new Vector2(2f, 4f);
+
+    public float gapOdds = 0.3f;
+    public float hazardDensity = 3;
+    public float Difficulty = 0.5f;
 
     public Direction direction;
     public float speed = 2.0f;
@@ -23,14 +31,43 @@ public class TrunkGeneratorScript : MonoBehaviour {
     public GameObject EffectLeft, EffectRight;
 
     public void Start() {
-	    if (randomizeValues) {
+        float LineValue = transform.position.z / 3f;
+        Difficulty = LineValue / GameStateControllerScript.Instance.maxDifficultyLine;
+        float Difficulty_Min = Mathf.Lerp(Difficulty, 0f, 0.25f);
+        float Difficulty_Max = Mathf.Lerp(Difficulty, 1f, 0.25f);
+        if (randomizeValues)
+        {
+            direction = Random.value < 0.5f ? Direction.Left : Direction.Right;
+
+            //So these values need some sort of bias for the difficulty...
+            //speed = Random.Range(Mathf.Lerp(speedRange.x, speedRange.y, Difficulty_Min),
+            //    Mathf.Lerp(speedRange.x, speedRange.y, Difficulty_Max));
+            speed = Random.Range(speedRange.x, speedRange.y);
+            hazardDensity = Random.Range(Mathf.Lerp(hazardDensityRange.x, hazardDensityRange.y, Difficulty_Min),
+                Mathf.Lerp(hazardDensityRange.x, hazardDensityRange.y, Difficulty_Max));
+            //hazardDensity = hazardDensityRange.y - hazardDensity; //Invert the hazard density so that things become more sparse as we go on
+
+            gapOdds = Random.Range(Mathf.Lerp(gapOddsRange.y, gapOddsRange.x, Difficulty_Min),
+                Mathf.Lerp(gapOddsRange.y, gapOddsRange.x, Difficulty_Max));
+
+            length = Random.Range(lengthRange.x, lengthRange.y);
+
+            float distance = rightX - leftX;
+            float travelTime = distance / speed;
+            interval = travelTime / hazardDensity;
+
+            EffectLeft.SetActive(direction == Direction.Right);
+            EffectRight.SetActive(direction == Direction.Left);
+        }
+        /*
+        if (randomizeValues) {
             direction = Random.value < 0.5f ? Direction.Left : Direction.Right;
             speed = Random.Range(2.0f, 4.0f);
             length = Random.Range(2, 4);
             interval = length / speed + Random.Range(2.0f, 4.0f);
             EffectLeft.SetActive(direction == Direction.Right);
             EffectRight.SetActive(direction == Direction.Left);
-        }
+        }*/
 
         elapsedTime = interval; //As we'll be pre-populating
         trunks = new List<GameObject>();

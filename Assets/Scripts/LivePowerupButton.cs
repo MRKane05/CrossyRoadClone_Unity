@@ -8,6 +8,7 @@ public class LivePowerupButton : MonoBehaviour {
     public Image ButtonIcon;
     public GameObject powerupPrefab;
     public AudioClip dropSuccess, dropFail;
+    public bool bBeenActivated = false;
     public void setupButton(GameObject newPowerupPrefab, Sprite powerupSprite)
     {
         powerupPrefab = newPowerupPrefab;
@@ -17,6 +18,8 @@ public class LivePowerupButton : MonoBehaviour {
 
     public void activateButton()
     {
+        if (bBeenActivated) { return; }
+        bBeenActivated = true;
         //Basically we want this to send a call through to the level controller to drop our powerup somewhere and have it displayed where it's gone
         bool bPowerupAdded = LevelControllerScript.Instance.addPowerupToLevel(powerupPrefab);
         //We need to remove our button as it's been successful :)

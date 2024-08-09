@@ -63,7 +63,7 @@ public class PlayerMovementScript : MonoBehaviour {
     public List<Material> playerMaterials = new List<Material>();
     private Dictionary<Material, Material> materialMap = new Dictionary<Material, Material>();
 
-    GameObject spawnedCharacter;
+    public GameObject spawnedCharacter;
     GameObject currentCharacter;
     public void SetCharacter(GameObject thisCharacter)
     {

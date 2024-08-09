@@ -30,7 +30,7 @@ public class Powerup_Ghost : Powerup {
         return true;    //Successfully avoided death
     }
 
-    public virtual void RemovePowerup()
+    public override void RemovePowerup()
     {
         transform.DOShakeScale(0.5f).SetUpdate(true).OnComplete(() => { Destroy(gameObject); });
         Time.timeScale = 1f;
