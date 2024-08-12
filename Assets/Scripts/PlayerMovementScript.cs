@@ -23,8 +23,8 @@ public class PlayerMovementScript : MonoBehaviour {
     public GameObject CharacterBase;    //What our prefab character will be spawned on (logically)
     public GameObject DefaultCharacter;
 
-    public int minX = -4;
-    public int maxX = 4;
+    //public int minX = -4;
+    //public int maxX = 4;
     public int XMoveLimit = 9;
 
     private bool moving;
@@ -296,11 +296,11 @@ public class PlayerMovementScript : MonoBehaviour {
 			}
             else { // (Mathf.Abs(z) < Mathf.Abs(x))
 				if (x > 0) {
-					if (Mathf.RoundToInt(current.x) < maxX)
+					if (Mathf.RoundToInt(current.x) < XMoveLimit)
 						Move(new Vector3(3, 0, 0));
 				}
                 else { // (x < 0)
-					if (Mathf.RoundToInt(current.x) > minX)
+					if (Mathf.RoundToInt(current.x) > -XMoveLimit)
 						Move(new Vector3(-3, 0, 0));
 				}
 			}
@@ -335,11 +335,11 @@ public class PlayerMovementScript : MonoBehaviour {
             Move(new Vector3(0, 0, -3));
         }
         else if (Input.GetKeyDown(KeyCode.A) || Input.GetButtonDown("Dleft") || Input.GetButtonDown("Square")) {
-            if (Mathf.RoundToInt(current.x) > minX)
+            if (Mathf.RoundToInt(current.x) > -XMoveLimit)
                 Move(new Vector3(-3, 0, 0));
         }
         else if (Input.GetKeyDown(KeyCode.D) || Input.GetButtonDown("Dright") || Input.GetButtonDown("Circle")) {
-            if (Mathf.RoundToInt(current.x) < maxX)
+            if (Mathf.RoundToInt(current.x) < XMoveLimit)
                 Move(new Vector3(3, 0, 0));
         }
     }
@@ -367,10 +367,12 @@ public class PlayerMovementScript : MonoBehaviour {
             case CanvasRotator.enScreenOrientation.LANDSCAPE:
                 break; //Do nothing with our input
             case CanvasRotator.enScreenOrientation.LEFT:
-                distance = Quaternion.AngleAxis(270, Vector3.up) * distance;
+                //Debug.Log("PrevDist: " + distance);
+                distance = Quaternion.AngleAxis(270f, Vector3.up) * distance;
+                //Debug.Log("PostDist: " + distance);
                 break;
             case CanvasRotator.enScreenOrientation.RIGHT:
-                distance = Quaternion.AngleAxis(90, Vector3.up) * distance;
+                distance = Quaternion.AngleAxis(90f, Vector3.up) * distance;
                 break;
             default:
                 break;
@@ -380,8 +382,10 @@ public class PlayerMovementScript : MonoBehaviour {
 
         playerMoves++;
         EagleTimeTicker = 0; //We moved! Call off the Eagle!
-
         var newPosition = transform.position + distance;
+
+        //Quickly clamp our position so we can't exit our bounds
+        newPosition = new Vector3(Mathf.Clamp(newPosition.x, -XMoveLimit, XMoveLimit), newPosition.y, newPosition.z);
 
         //PROBLEM: Need to see if we're moving into something
         // Don't move if blocked by obstacle.
@@ -400,13 +404,6 @@ public class PlayerMovementScript : MonoBehaviour {
                 newPosition = hit.point - distance.normalized * 0.75f;
             }
         }
-        /*
-        if (Physics.CheckSphere(newPosition + new Vector3(0.0f, 0.5f, 0.0f), 0.1f, stopperLayerMask))
-        {
-            Debug.Log("Got Collision With Move");
-            return false;
-        }
-        */
 
         target = newPosition;
 
@@ -414,7 +411,7 @@ public class PlayerMovementScript : MonoBehaviour {
         body.isKinematic = true;
         //Debug.Log(MoveDirection);
         CharacterBase.transform.LookAt(CharacterBase.transform.position + distance, Vector3.up);
-        if (distance.z < 0) //We're moving backwards
+        if (distance.z < -2) //We're moving backwards
         {
             backDirectionCount++;
         }
@@ -422,7 +419,6 @@ public class PlayerMovementScript : MonoBehaviour {
         {
             backDirectionCount = Mathf.Max(0, backDirectionCount - 1);
         }
-        //Debug.Log("BackCount: " + backDirectionCount);
 
         //So we want to move our player to a new location. Of course this is going to be forced modal.
         Vector3 targetPosition = makeModal(newPosition);
@@ -496,12 +492,15 @@ public class PlayerMovementScript : MonoBehaviour {
 
     private Vector3 makeModal(Vector3 newPosition)
     {
+        return new Vector3(newPosition.x, 1f, Mathf.RoundToInt(newPosition.z / 3f) * 3f);
+        /*
         if (GameStateControllerScript.Instance.ScreenOrientation == CanvasRotator.enScreenOrientation.LANDSCAPE)
         {
             return new Vector3(newPosition.x, 1f, Mathf.RoundToInt(newPosition.z / 3f) * 3f);
         }
         //Handle our side angles
         return new Vector3(Mathf.RoundToInt(newPosition.x / 3f) * 3f, 1f, newPosition.z);
+        */
     }
 
     public bool IsMoving {
