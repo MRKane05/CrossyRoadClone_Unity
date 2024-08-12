@@ -415,7 +415,7 @@ public class PlayerMovementScript : MonoBehaviour {
         {
             backDirectionCount++;
         }
-        else
+        else if (distance.z > 2)
         {
             backDirectionCount = Mathf.Max(0, backDirectionCount - 1);
         }
