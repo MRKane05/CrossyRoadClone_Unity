@@ -378,8 +378,6 @@ public class PlayerMovementScript : MonoBehaviour {
                 break;
         }
 
-        //Debug.Log("Rotated Distance: " + distance);
-
         playerMoves++;
         EagleTimeTicker = 0; //We moved! Call off the Eagle!
         var newPosition = transform.position + distance;
@@ -391,18 +389,23 @@ public class PlayerMovementScript : MonoBehaviour {
         // Don't move if blocked by obstacle.
         //Lets change this to something a bit more flexible :)
         RaycastHit hit;
+        //Debug.Log(distance);
+        //Debug.DrawLine(transform.position, transform.position + distance, Color.red, 3f);
         // Does the ray intersect any objects excluding the player layer
         if (Physics.Raycast(transform.position, distance.normalized, out hit, 3, stopperLayerMask))
         {
+            /*
             if (distance.z != 0)
             {
+                Debug.Log("Move blocked due to distance.z");
                 return false; //We can't move forward/backwards here
             }
             else
             {
+            */
                 //We need to position to where our hit was minus our volume
                 newPosition = hit.point - distance.normalized * 0.75f;
-            }
+            //}
         }
 
         target = newPosition;
